@@ -55,6 +55,11 @@ Também dá para subir a pasta num repositório do GitHub e importar em vercel.c
 - **Cores da marca:** variáveis no `:root`, no topo do `<style>` (`--azul`, `--amarelo`, etc.).
 - **WhatsApp:** constantes `WA_BANHO` e `WA_CLINICA` no início do `<script>`.
 - **Regras padrão:** objeto `CFG_PADRAO` (modo verão, faixa de calor, idade de idoso, vagas, dias permitidos e raças braquicefálicas). Também dá para editar tudo pela aba **Regras** do painel.
+- **Fotos:** ficam na pasta `img/`, em WebP com no máximo 1024 px de largura. Para trocar uma foto, basta substituir o arquivo mantendo o nome:
+  - `banner-largo.webp`: topo da etapa 1 e prévia do link na conversa
+  - `banho.webp`, `banho-e-tosa.webp`, `tosa-higienica.webp`: cartões de serviço
+  - `transporte.webp` (aviso do carro), `idoso.webp`, `agitado.webp`, `clinica.webp` (pet bravo), `confirmado.webp` (tela de sucesso): opcionais; sem o arquivo, a página mostra o ícone padrão
+  - `banner-vertical.webp`: reserva, ainda não usada
 - **Dados de exemplo:** botão "Restaurar dados de exemplo" no painel. Ele gera agendamentos fictícios para as próximas 2 semanas e volta as regras ao padrão.
 
 ## Testes

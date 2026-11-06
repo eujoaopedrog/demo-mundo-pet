@@ -179,6 +179,31 @@ input,select,textarea{font:inherit;color:inherit}
 .aviso-alerta{background:var(--alerta-claro);color:var(--alerta)}
 .aviso-perigo{background:var(--perigo-claro);color:#9E2626}
 .aviso-ok{background:var(--ok-claro);color:#0D6B42}
+.hero{position:relative;border-radius:20px;overflow:hidden;background:var(--amarelo);margin:0 0 14px;aspect-ratio:1024/572;box-shadow:0 8px 22px rgba(160,110,0,.18)}
+.hero img{display:block;width:100%;height:100%;object-fit:cover;object-position:right center}
+.hero-txt{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:50%;color:var(--tinta)}
+.hero-txt b{display:block;font-size:20px;line-height:1.15;font-weight:900;letter-spacing:-.2px}
+.hero-txt span{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:800;background:rgba(255,255,255,.85);color:var(--azul-escuro);padding:4px 9px;border-radius:99px;line-height:1.25}
+.aviso-midia{flex:none;display:inline-flex}
+.aviso-midia img{width:58px;height:58px;border-radius:12px;object-fit:cover;background:var(--amarelo)}
+.aviso-midia .ico{display:none}
+.aviso-midia.sem-foto img{display:none}
+.aviso-midia.sem-foto .ico{display:inline-block}
+.foto-aviso{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:center 40%;border-radius:14px;margin-bottom:10px;background:var(--amarelo)}
+.foto-ok{position:relative;width:150px;margin:4px auto 16px}
+.foto-ok img{display:block;width:150px;height:150px;border-radius:50%;object-fit:cover;object-position:center 45%;box-shadow:0 0 0 6px #fff,0 10px 26px rgba(160,110,0,.25);animation:pop .5s cubic-bezier(.2,1.4,.4,1);background:var(--amarelo)}
+.foto-ok .check-ok{position:absolute;right:-4px;bottom:-2px;width:52px;height:52px;margin:0;box-shadow:0 0 0 5px #fff}
+.foto-ok .check-ok svg{width:28px;height:28px}
+.foto-ok.sem-foto{width:auto}
+.foto-ok.sem-foto img{display:none}
+.foto-ok.sem-foto .check-ok{position:static;width:84px;height:84px;margin:6px auto 12px;box-shadow:0 0 0 10px var(--ok-claro)}
+.foto-ok.sem-foto .check-ok svg{width:44px;height:44px}
+.foto-clinica{position:relative;width:170px;margin:4px auto 14px}
+.foto-clinica img{display:block;width:170px;height:170px;border-radius:28px;object-fit:cover;object-position:center 30%;background:var(--amarelo);box-shadow:0 10px 26px rgba(20,33,61,.15)}
+.foto-clinica .icone-grande{display:none}
+.foto-clinica.sem-foto{width:auto}
+.foto-clinica.sem-foto img{display:none}
+.foto-clinica.sem-foto .icone-grande{display:grid}
 .faixa-oferta{display:flex;gap:8px;align-items:flex-start;background:var(--amarelo-claro);border:1px solid #F5E0A0;color:#6B5200;border-radius:12px;padding:8px 11px;font-size:12px;font-weight:700;margin-bottom:16px}
 .faixa-oferta .ico{width:16px;height:16px;margin-top:1px}
 .faixa-oferta em{font-style:normal;opacity:.8}
@@ -192,6 +217,7 @@ input,select,textarea{font:inherit;color:inherit}
 /* ---------- Serviços ---------- */
 .servico{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:2px solid var(--linha);border-radius:var(--raio);padding:16px;margin-bottom:10px;transition:border-color .18s, background .18s, box-shadow .18s}
 .servico .s-ico{width:48px;height:48px;border-radius:14px;background:var(--azul-claro);color:var(--azul);display:grid;place-items:center;flex:none}
+.servico .s-foto{width:72px;height:72px;border-radius:14px;object-fit:cover;flex:none;background:var(--amarelo)}
 .servico .s-txt{flex:1;min-width:0}
 .servico b{display:block;font-size:17px;font-weight:900}
 .servico small{display:block;color:var(--suave);font-weight:700;font-size:13px}
@@ -314,8 +340,10 @@ details.porque p{margin:6px 0 0;font-weight:700}
 .ticks.lido .ico{color:#34B7F1}
 .wa-auto{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--wa-topo);margin-bottom:4px}
 .wa-auto .ico{width:12px;height:12px}
-.wa-card{display:flex;gap:10px;align-items:center;background:#F0F4F8;border-left:4px solid var(--azul);border-radius:8px;padding:10px;text-decoration:none;color:var(--tinta);margin:2px 0 8px}
-.wa-card-ico{width:40px;height:40px;border-radius:10px;background:var(--azul);color:#fff;display:grid;place-items:center;flex:none}
+.wa-card{display:block;background:#F0F4F8;border-radius:8px;overflow:hidden;text-decoration:none;color:var(--tinta);margin:2px 0 8px}
+.wa-card img{display:block;width:100%;height:auto;aspect-ratio:1024/572;object-fit:cover;background:var(--amarelo)}
+.wa-card-txt{display:flex;gap:10px;align-items:center;padding:9px 10px;border-left:4px solid var(--azul)}
+.wa-card-ico{width:36px;height:36px;border-radius:10px;background:var(--azul);color:#fff;display:grid;place-items:center;flex:none}
 .wa-card b{display:block;font-size:14.5px}
 .wa-card small{display:block;font-size:12px;color:var(--suave);font-weight:700}
 .wa-link{color:var(--wa-link);font-weight:800;text-decoration:underline}
@@ -426,6 +454,8 @@ body.largo .modal{max-width:520px;margin:0 auto;border-radius:22px 22px 0 0}
 select.inp{padding:0 10px;appearance:auto}
 
 @media (max-width:370px){
+  .hero-txt b{font-size:17px}
+  .servico .s-foto{width:60px;height:60px}
   .marca span{font-size:15px}
   .btn-equipe span{display:none}
   .btn-equipe{padding:8px}
@@ -485,9 +515,9 @@ var COMP = {
   bravo:   { nome:'Bravo',   desc:'Morde ou rosna',     ico:'bravo' }
 };
 var SERVICOS = {
-  banho:      { nome:'Banho',          desc:'Banho completo e secagem',      ico:'gota',    dur:{P:60,M:90,G:120,GG:150} },
-  banho_tosa: { nome:'Banho e tosa',   desc:'Banho completo + tosa',         ico:'tesoura', dur:{P:90,M:120,G:150,GG:180} },
-  higienica:  { nome:'Tosa higiênica', desc:'Patas, barriga e região íntima', ico:'brilho',  dur:{P:40,M:50,G:60,GG:75} }
+  banho:      { nome:'Banho',          desc:'Banho completo e secagem',      ico:'gota',    foto:'img/banho.webp',          dur:{P:60,M:90,G:120,GG:150} },
+  banho_tosa: { nome:'Banho e tosa',   desc:'Banho completo + tosa',         ico:'tesoura', foto:'img/banho-e-tosa.webp',   dur:{P:90,M:120,G:150,GG:180} },
+  higienica:  { nome:'Tosa higiênica', desc:'Patas, barriga e região íntima', ico:'brilho',  foto:'img/tosa-higienica.webp', dur:{P:40,M:50,G:60,GG:75} }
 };
 var DIAS_CURTO = ['dom','seg','ter','qua','qui','sex','sáb'];
 var DIAS_PLURAL = ['domingos','segundas','terças','quartas','quintas','sextas','sábados'];
@@ -535,6 +565,7 @@ var PATHS = {
   escudo:'<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M12 9v6M9 12h6"/>',
   desfazer:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
 };
+function midia(src, icoNome){ return '<span class="aviso-midia"><img src="'+src+'" alt="" width="58" height="58" onerror="this.parentNode.classList.add(\'sem-foto\')">'+ico(icoNome)+'</span>'; }
 function ico(n, cls){ return '<svg class="ico '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(PATHS[n]||'')+'</svg>'; }
 
 /* ============================================================
@@ -788,7 +819,7 @@ function tocarWa(){
       '<span class="wa-auto">'+ico('raio')+' Mensagem automática</span>'+
       '<p>Olá! 💙💛 Aqui é o <b>Mundo Pet Banho e Tosa</b>.</p>'+
       '<p>Agora você mesmo agenda pelo link: escolhe o serviço, o dia e o horário — e a confirmação chega na hora, sem esperar resposta.</p>'+
-      '<a class="wa-card" href="#agendar" data-act="ir-agendar"><span class="wa-card-ico">'+ico('cal')+'</span><span><b>Agende aqui em 1 minuto</b><small>Banho · Banho e tosa · Tosa higiênica</small></span></a>'+
+      '<a class="wa-card" href="#agendar" data-act="ir-agendar"><img src="img/banner-largo.webp" alt="" width="1024" height="572"><span class="wa-card-txt"><span class="wa-card-ico">'+ico('cal')+'</span><span><b>Agende aqui em 1 minuto</b><small>Banho · Banho e tosa · Tosa higiênica</small></span></span></a>'+
       '<p><a class="wa-link" id="wa-link" href="#agendar" data-act="ir-agendar">👉 Agende aqui em 1 minuto</a></p>'+
       '<p class="wa-mini">Seg a sex, 9h às 19h · sáb até 17h</p>'+
       '<span class="wa-hora">'+hora+'</span></div>');
@@ -845,6 +876,7 @@ function renderWizard(opts){
 function htmlPasso1(){
   var p = W.pet;
   return ''+
+  '<div class="hero"><img src="img/banner-largo.webp" alt="Cachorro e gato felizes depois do banho" width="1024" height="572"><div class="hero-txt"><b>Banho e tosa com hora marcada</b><span>Confirmação na hora</span></div></div>'+
   '<div class="faixa-oferta">'+ico('tag')+'<span><b>Ofertas da semana:</b> terça, 10% OFF em todos os produtos · quarta, 10% OFF em medicamentos <em>(retirada na loja)</em></span></div>'+
   '<h1 class="tit">Vamos conhecer seu pet</h1>'+
   '<p class="sub">Leva menos de 1 minuto. Os cuidados especiais de cada pet são aplicados automaticamente.</p>'+
@@ -873,11 +905,11 @@ function refresh1(){
     ? '<div class="aviso aviso-alerta">'+ico('vento')+'<p><b>Raça braquicefálica (focinho curto).</b> Vamos aplicar regras especiais de dia, horário e transporte para a segurança do pet.</p></div>'
     : (p.raca === SRD ? '<div class="aviso aviso-info">'+ico('info')+'<p>Sem problema! Só escolha o porte abaixo.</p></div>' : '');
   var ii = document.getElementById('idade-info');
-  if (ii) ii.innerHTML = f.idoso ? '<div class="aviso aviso-info">'+ico('info')+'<p><b>Pet idoso ('+cfg.idadeIdoso+'+ anos):</b> atendido em dias mais tranquilos ('+listaDiasCurto()+').</p></div>' : '';
+  if (ii) ii.innerHTML = f.idoso ? '<div class="aviso aviso-info">'+midia('img/idoso.webp','info')+'<p><b>Pet idoso ('+cfg.idadeIdoso+'+ anos):</b> atendido em dias mais tranquilos ('+listaDiasCurto()+').</p></div>' : '';
   var ci = document.getElementById('comp-info');
   if (ci) ci.innerHTML = f.bravo
     ? '<div class="aviso aviso-perigo">'+ico('escudo')+'<p><b>Pets bravos são atendidos pela clínica</b>, com acompanhamento veterinário.</p></div>'
-    : (f.agitado ? '<div class="aviso aviso-info">'+ico('info')+'<p><b>Pet agitado:</b> atendido com mais calma, de '+listaDiasCurto()+'.</p></div>' : '');
+    : (f.agitado ? '<div class="aviso aviso-info">'+midia('img/agitado.webp','info')+'<p><b>Pet agitado:</b> atendido com mais calma, de '+listaDiasCurto()+'.</p></div>' : '');
 }
 function renderListaRacas(q){
   var lista = document.getElementById('lista-racas'), inp = document.getElementById('f-raca');
@@ -920,7 +952,7 @@ function htmlPasso2(){
     Object.keys(SERVICOS).map(function(k){
       var s = SERVICOS[k];
       return '<button type="button" class="servico'+(W.servico === k ? ' sel' : '')+'" data-act="servico" data-v="'+k+'">'+
-        '<span class="s-ico">'+ico(s.ico,'grande')+'</span><span class="s-txt"><b>'+s.nome+'</b><small>'+s.desc+'</small>'+
+        '<img class="s-foto" src="'+s.foto+'" alt="" width="72" height="72"><span class="s-txt"><b>'+s.nome+'</b><small>'+s.desc+'</small>'+
         '<span class="dur">'+ico('relogio')+'~'+fmtDur(s.dur[porte])+'</span></span><span class="radio">'+ico('check')+'</span></button>';
     }).join('')+'<div class="msg-erro">Escolha um serviço</div></div>';
 }
@@ -987,7 +1019,7 @@ function htmlPasso3(){
 function htmlPasso4(){
   var f = flagsDe(W.pet), s = SERVICOS[W.servico];
   var avisoBraqui = f.braqui ?
-    '<div class="campo" id="c-carro"><div class="aviso aviso-alerta" style="margin-top:0">'+ico('carro')+'<div><p><b>Transporte: somente de carro com ar-condicionado.</b> '+esc(W.pet.nome)+' não pode vir caminhando, mesmo morando perto. O Taxi Dog não transporta braquicefálicos.</p>'+
+    '<div class="campo" id="c-carro"><img class="foto-aviso" src="img/transporte.webp" alt="Pug no banco de trás do carro, com cinto e ar-condicionado" onerror="this.remove()"><div class="aviso aviso-alerta" style="margin-top:0">'+ico('carro')+'<div><p><b>Transporte: somente de carro com ar-condicionado.</b> '+esc(W.pet.nome)+' não pode vir caminhando, mesmo morando perto. O Taxi Dog não transporta braquicefálicos.</p>'+
       '<details class="porque"><summary>'+ico('info','mini')+' Por quê?</summary><p>Raças de focinho curto têm mais risco de dificuldade respiratória e colapso de traqueia no calor.</p></details></div></div>'+
       '<label class="caixa-check"><input type="checkbox" id="f-carro"'+(W.carro ? ' checked' : '')+'><span>Confirmo que o pet virá de carro com ar-condicionado</span></label>'+
       '<div class="msg-erro">Para braquicefálicos, essa confirmação é obrigatória</div></div>' : '';
@@ -1029,7 +1061,7 @@ function msgComprovante(a){
 function htmlPasso5(){
   var a = W.ultimo; if (!a) return '';
   var f = flagsDe(a), al = alertasDe(a);
-  return '<div class="centro"><div class="check-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>'+
+  return '<div class="centro"><div class="foto-ok"><img src="img/confirmado.webp" alt="" onerror="this.parentNode.classList.add(\'sem-foto\')"><div class="check-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>'+
     '<h1 class="tit" id="titulo-ok">Agendamento confirmado — não precisa esperar resposta</h1>'+
     '<p class="sub">O horário de '+esc(a.pet)+' já está reservado na agenda do Mundo Pet.</p></div>'+
     '<div class="resumo">'+
@@ -1054,7 +1086,7 @@ function msgClinica(){
     '(Encaminhado pelo agendamento online do banho e tosa)';
 }
 function htmlBravo(){
-  return '<div class="centro"><div class="icone-grande" style="background:var(--perigo-claro);color:var(--perigo)">'+ico('escudo')+'</div>'+
+  return '<div class="centro"><div class="foto-clinica"><img src="img/clinica.webp" alt="Cachorro em consulta veterinária" onerror="this.parentNode.classList.add(\'sem-foto\')"><div class="icone-grande" style="background:var(--perigo-claro);color:var(--perigo)">'+ico('escudo')+'</div></div>'+
     '<h1 class="tit" id="titulo-bravo">'+esc(W.pet.nome)+' precisa de um cuidado especial</h1></div>'+
     '<div class="resumo" style="padding:14px 16px;font-weight:700;color:var(--suave)">'+
       '<p style="margin:0 0 10px">Para pets <b style="color:var(--tinta)">bravos ou agressivos</b>, a tosa é feita com <b style="color:var(--tinta)">acompanhamento veterinário e sedação</b>, para a segurança do pet e da equipe.</p>'+
