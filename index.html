@@ -251,6 +251,7 @@ input,select,textarea{font:inherit;color:inherit}
 .dia.sel{background:var(--azul);border-color:var(--azul);color:#fff;box-shadow:0 6px 14px rgba(31,79,216,.3)}
 .dia.sel small{color:#D7E1FF}
 .dia.sel i{background:var(--amarelo)}
+.dia.hoje{padding-top:8px}
 .dia.hoje::after{content:'hoje';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--amarelo);color:#5a4300;font-size:9px;font-weight:900;padding:0 5px;border-radius:6px;line-height:14px}
 .cal-mes{font-size:12.5px;color:var(--suave);font-weight:800}
 
@@ -523,7 +524,7 @@ var DIAS_CURTO = ['dom','seg','ter','qua','qui','sex','sáb'];
 var DIAS_PLURAL = ['domingos','segundas','terças','quartas','quintas','sextas','sábados'];
 var DIAS_FEIRA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-var NOMES_PET = ['Thor','Mel','Luna','Bob','Nina','Fred','Belinha','Pipoca','Max','Amora','Toby','Lola','Paçoca','Zeus','Maya','Billy','Cookie','Frida','Theo','Kiara','Bento','Jade','Ozzy','Cacau'];
+var NOMES_PET = ['Nala','Mel','Luna','Bob','Nina','Fred','Belinha','Pipoca','Max','Amora','Toby','Lola','Paçoca','Zeus','Maya','Billy','Cookie','Frida','Theo','Kiara','Bento','Jade','Ozzy','Cacau'];
 var TUTORES = ['Ana','Carlos','Fernanda','Rafael','Juliana','Marcos','Patrícia','Diego','Camila','Bruno','Letícia','André','Beatriz','Gustavo','Larissa','Paulo'];
 
 /* ============================================================
@@ -718,8 +719,8 @@ function gerarExemplos(){
         if (BRAQUI_PADRAO.indexOf(raca) >= 0 && (!sensDia || quente)) raca = calmas[s % calmas.length][0];
         if (!sensDia){ if (idade >= CFG_PADRAO.idadeIdoso) idade = (idade % 7) + 1; comp = 'calmo'; }
         out.push({
-          id:'ex'+(++n), pet:NOMES_PET[(s >>> 3) % NOMES_PET.length], raca:raca, idade:idade, porte:porteSugerido(raca) || 'M', comp:comp,
-          servico:servs[(s >>> 13) % 4], data:data, hora:h, tutor:TUTORES[(s >>> 7) % TUTORES.length], tel:'',
+          id:'ex'+(++n), pet:NOMES_PET[hash('pet'+n+data) % NOMES_PET.length], raca:raca, idade:idade, porte:porteSugerido(raca) || 'M', comp:comp,
+          servico:servs[(s >>> 13) % 4], data:data, hora:h, tutor:TUTORES[hash('tutor'+n+data) % TUTORES.length], tel:'',
           origem: ((s >>> 11) % 3 === 0) ? 'balcao' : 'online',
           status: (i === 0 && h < agoraH) ? 'concluido' : 'agendado', criado: 0
         });
@@ -962,15 +963,14 @@ function htmlRegras(f){
   var nome = esc(W.pet.nome || 'seu pet');
   if (!sensivel(f)) return '<div class="regras livre"><div class="regras-tit">'+ico('check')+' Nenhuma restrição para '+nome+': todos os dias de expediente estão liberados.</div></div>';
   var li = [];
+  var quem = []; if (f.braqui) quem.push('braquicefálico'); if (f.idoso) quem.push('idoso, '+idadeTxt(W.pet.idade)); if (f.agitado) quem.push('agitado');
+  li.push('<li>'+ico('cal')+'<span>Somente '+listaDias()+' <em style="font-style:normal;opacity:.8">('+juntar(quem)+')</em></span></li>');
   if (f.braqui) {
-    li.push('<li>'+ico('cal')+'<span>Braquicefálico: somente '+listaDias()+'</span></li>');
     li.push(cfg.verao
       ? '<li>'+ico('sol')+'<span>Modo verão: sem horários quentes ('+cfg.quenteIni+'h às '+cfg.quenteFim+'h)</span></li>'
       : '<li>'+ico('sol')+'<span>Modo verão desligado: horários da tarde liberados</span></li>');
     li.push('<li>'+ico('carro')+'<span>Deve vir de carro com ar-condicionado</span></li>');
   }
-  if (f.idoso) li.push('<li>'+ico('cal')+'<span>Pet idoso ('+idadeTxt(W.pet.idade)+'): somente '+listaDias()+'</span></li>');
-  if (f.agitado) li.push('<li>'+ico('cal')+'<span>Pet agitado: somente '+listaDias()+'</span></li>');
   return '<div class="regras"><div class="regras-tit">'+ico('escudo')+' Regras aplicadas para '+nome+' '+tagsHTML(f)+'</div><ul>'+li.join('')+'</ul></div>';
 }
 function tagsHTML(f){
@@ -1070,7 +1070,7 @@ function htmlPasso5(){
       '<div class="resumo-linha">'+ico('cal')+'<div><small>Data e horário</small><b>'+cap(dataLonga(a.data))+'</b> às <b>'+hh(a.hora)+'</b></div></div>'+
       '<div class="resumo-linha">'+ico('usuario')+'<div><small>Tutor</small><b>'+esc(a.tutor)+'</b> · '+esc(a.tel)+'</div></div>'+
     '</div>'+
-    (al.length ? al.map(function(x, i){ return '<div class="aviso '+(i === 0 && f.braqui ? 'aviso-alerta' : 'aviso-info')+'">'+ico(i === 0 && f.braqui ? 'carro' : 'info')+'<p>'+esc(x)+'</p></div>'; }).join('') : '')+
+    (f.braqui ? '<div class="aviso aviso-alerta">'+ico('carro')+'<p><b>Lembrete:</b> traga '+esc(a.pet)+' de carro com ar-condicionado. Não pode vir caminhando, mesmo morando perto, e o Taxi Dog não transporta braquicefálicos.</p></div>' : '')+
     '<div class="pilha">'+
       '<a class="btn btn-sec btn-cheio" id="btn-comprovante" href="'+esc(waLink(WA_BANHO, msgComprovante(a)))+'" target="_blank" rel="noopener">'+ico('chat')+' Receber comprovante no WhatsApp</a>'+
       '<button class="btn btn-fant btn-cheio" data-act="novo">'+ico('mais')+' Fazer outro agendamento</button>'+
@@ -1217,7 +1217,7 @@ function htmlAgenda(){
   return '<div class="resumo-dia">'+
       '<div class="kpi"><b>'+deHoje.length+'</b><small>hoje</small></div>'+
       '<div class="kpi"><b>'+concl+'</b><small>concluídos hoje</small></div>'+
-      '<div class="kpi"><b>'+proximos+'</b><small>a atender (14 dias)</small></div>'+
+      '<div class="kpi"><b>'+proximos+'</b><small>próx. 14 dias</small></div>'+
     '</div>'+
     '<div class="barra-ferr"><div class="seg"><button class="'+(P.modo === 'dia' ? 'sel' : '')+'" data-act="painel-modo" data-v="dia">Dia</button><button class="'+(P.modo === 'semana' ? 'sel' : '')+'" data-act="painel-modo" data-v="semana">Semana</button></div>'+
     '<button class="btn btn-pri btn-peq" data-act="balcao" id="btn-balcao">'+ico('mais')+' Agendamento do balcão</button></div>'+
