@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Agendamento Banho e Tosa — Demonstração</title>
+<meta name="description" content="Protótipo de demonstração de agendamento online de banho e tosa. Criado pela WOHAOS.">
+<meta name="theme-color" content="#1F4FD8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CORES DA MARCA — troque aqui quando tiver o logo oficial
+   ============================================================ */
+:root{
+  --azul:#1F4FD8;
+  --azul-escuro:#163A9E;
+  --azul-claro:#E9EFFF;
+  --amarelo:#FFC629;
+  --amarelo-claro:#FFF6D8;
+
+  --tinta:#14213D;
+  --suave:#5D6A84;
+  --linha:#E1E7F2;
+  --fundo:#F3F6FB;
+  --cartao:#FFFFFF;
+
+  --ok:#15915B;
+  --ok-claro:#E2F5EB;
+  --alerta:#9A5B00;
+  --alerta-claro:#FFF3DA;
+  --perigo:#CF3B3B;
+  --perigo-claro:#FDEBEB;
+
+  --tag-braqui:#DE5226;
+  --tag-idoso:#6F4FE6;
+  --tag-agitado:#B57A00;
+
+  --raio:16px;
+  --sombra:0 6px 20px rgba(20,33,61,.07);
+
+  /* simulação de conversa (tela 0) */
+  --wa-topo:#0E6E60;
+  --wa-fundo:#EFE7DD;
+  --wa-enviada:#D8FDD2;
+  --wa-recebida:#FFFFFF;
+  --wa-link:#0277B5;
+  --wa-botao:#1DA851;
+
+  --fonte:'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--fonte);color:var(--tinta);background:var(--fundo);-webkit-font-smoothing:antialiased;overflow:hidden;font-size:15px;line-height:1.4}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;-webkit-tap-highlight-color:transparent}
+a{-webkit-tap-highlight-color:transparent}
+input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.ico{width:20px;height:20px;flex:none;display:inline-block;vertical-align:middle}
+.ico.grande{width:26px;height:26px}
+.ico.mini{width:14px;height:14px}
+
+/* ---------- Moldura do "celular" ---------- */
+.phone{position:relative;display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;max-width:430px;margin:0 auto;background:var(--fundo);overflow:hidden}
+@media (min-width:600px){
+  body{background:radial-gradient(circle at 15% 10%,#dbe5ff,transparent 45%),radial-gradient(circle at 85% 90%,#fff0bf,transparent 45%),#e8edf7}
+  .phone{height:calc(100dvh - 40px);margin:20px auto;border-radius:34px;box-shadow:0 30px 80px rgba(20,33,61,.25),0 0 0 10px #10182b}
+  body.largo .phone{max-width:880px}
+}
+
+/* ---------- Topo ---------- */
+.topo{flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--azul);color:#fff;min-height:62px}
+.marca{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.marca>div{min-width:0}
+.marca .selo{width:38px;height:38px;border-radius:12px;background:var(--amarelo);color:var(--azul-escuro);display:grid;place-items:center;flex:none}
+.marca .selo .ico{width:22px;height:22px}
+.marca span{display:block;font-weight:900;font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.marca small{display:block;font-weight:700;font-size:12px;opacity:.85}
+.btn-equipe{margin-left:auto;flex:none;font-size:12px;font-weight:800;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn-equipe .ico{width:14px;height:14px}
+.topo-voltar{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.14);color:#fff;flex:none}
+.ao-vivo{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;background:rgba(255,255,255,.14);padding:6px 10px;border-radius:999px;white-space:nowrap}
+.ao-vivo i{width:8px;height:8px;border-radius:50%;background:#5BF0A5;box-shadow:0 0 0 0 rgba(91,240,165,.7);animation:pulso 1.6s infinite}
+@keyframes pulso{70%{box-shadow:0 0 0 8px rgba(91,240,165,0)}100%{box-shadow:0 0 0 0 rgba(91,240,165,0)}}
+
+/* ---------- Progresso ---------- */
+.prog{flex:none;background:#fff;padding:10px 16px 12px;border-bottom:1px solid var(--linha)}
+.prog-info{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--suave);margin-bottom:7px}
+.prog-info b{color:var(--azul)}
+.prog-barra{height:7px;border-radius:99px;background:var(--azul-claro);overflow:hidden}
+.prog-barra i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--azul),#4C7BFF);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- Área rolável ---------- */
+.rolagem{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative;min-height:0}
+#tela{padding:18px 16px 24px;min-width:0}
+.anima-frente{animation:entra .34s cubic-bezier(.2,.8,.2,1)}
+.anima-tras{animation:entraVolta .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes entra{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes entraVolta{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+@keyframes surge{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes treme{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ---------- Barra de ações ---------- */
+.acoes{flex:none;display:flex;gap:10px;padding:10px 16px;background:#fff;border-top:1px solid var(--linha)}
+.rodape{flex:none;text-align:center;font-size:11px;line-height:1.35;color:var(--suave);padding:6px 12px calc(6px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--linha)}
+.rodape a{color:var(--azul);font-weight:800;text-decoration:none}
+.rodape small{display:block;font-size:10.5px;opacity:.85}
+
+/* ---------- Botões ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 18px;border-radius:14px;font-weight:800;font-size:16px;text-decoration:none;transition:transform .12s, box-shadow .2s, background .2s;text-align:center}
+.btn:active{transform:scale(.98)}
+.btn-pri{background:var(--azul);color:#fff;box-shadow:0 6px 16px rgba(31,79,216,.28)}
+.btn-sec{background:#fff;color:var(--azul);border:2px solid var(--azul)}
+.btn-wa{background:var(--wa-botao);color:#fff;box-shadow:0 6px 16px rgba(29,168,81,.25)}
+.btn-fant{background:transparent;color:var(--suave);min-height:44px}
+.btn-cheio{width:100%}
+.acoes .btn-pri{flex:1}
+.acoes .btn-sec{flex:0 0 auto;padding:0 16px}
+.btn-peq{min-height:38px;font-size:13.5px;padding:0 12px;border-radius:11px}
+
+/* ---------- Tipografia ---------- */
+.tit{font-size:23px;line-height:1.2;font-weight:900;margin:2px 0 6px;letter-spacing:-.2px}
+.sub{color:var(--suave);margin:0 0 18px;font-size:14.5px}
+.rot,.campo>label{display:block;font-weight:800;font-size:14px;margin-bottom:8px}
+.dica{font-size:12.5px;color:var(--suave);margin-top:6px}
+.secao-tit{font-size:15px;font-weight:900;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+.secao-tit small{font-weight:700;color:var(--suave);font-size:12.5px;margin-left:auto}
+
+/* ---------- Campos ---------- */
+.campo{margin-bottom:18px}
+.inp{width:100%;height:52px;border:2px solid var(--linha);border-radius:14px;background:#fff;padding:0 14px;font-size:16px;font-weight:700;outline:none;transition:border-color .2s, box-shadow .2s}
+.inp:focus{border-color:var(--azul);box-shadow:0 0 0 4px rgba(31,79,216,.12)}
+.inp::placeholder{color:#A3ADBF;font-weight:600}
+.campo.erro .inp,.campo.erro .opc,.campo.erro .stepper{border-color:var(--perigo)}
+.campo.erro{animation:treme .3s}
+.campo .msg-erro{display:none;color:var(--perigo);font-size:12.5px;font-weight:800;margin-top:6px}
+.campo.erro .msg-erro{display:block}
+
+.busca{position:relative}
+.busca>.ico{position:absolute;left:14px;top:16px;color:#9AA5B8;pointer-events:none}
+.busca .inp{padding-left:42px}
+.busca-lista{position:absolute;left:0;right:0;top:56px;z-index:20;background:#fff;border:1px solid var(--linha);border-radius:14px;box-shadow:0 14px 30px rgba(20,33,61,.15);max-height:260px;overflow-y:auto;padding:6px;animation:surge .18s}
+.busca-item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:11px 10px;border-radius:10px;font-weight:700}
+.busca-item:hover,.busca-item:focus{background:var(--azul-claro);outline:none}
+.busca-item small{margin-left:auto;color:var(--suave);font-weight:700;font-size:12px;white-space:nowrap}
+.busca-item .tag{margin-left:auto}
+.busca-item .tag+small{margin-left:6px}
+.busca-vazio{padding:10px;color:var(--suave);font-size:13px}
+
+.stepper{display:flex;align-items:center;border:2px solid var(--linha);border-radius:14px;background:#fff;height:52px;overflow:hidden}
+.st-btn{width:56px;height:100%;font-size:24px;font-weight:800;color:var(--azul);flex:none}
+.st-btn:active{background:var(--azul-claro)}
+.st-val{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border-left:1px solid var(--linha);border-right:1px solid var(--linha);height:100%;min-width:0}
+.st-val input{width:56px;border:0;outline:none;text-align:right;font-size:20px;font-weight:900;background:transparent;-moz-appearance:textfield}
+.st-val input::-webkit-outer-spin-button,.st-val input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.st-val span{font-weight:800;color:var(--suave)}
+
+.grade4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.grade3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.opc{background:#fff;border:2px solid var(--linha);border-radius:14px;padding:11px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;transition:border-color .18s, background .18s, box-shadow .18s, transform .12s;min-width:0}
+.opc:active{transform:scale(.97)}
+.opc b{font-size:17px;font-weight:900}
+.opc small{font-size:11.5px;color:var(--suave);font-weight:700;line-height:1.2}
+.opc.sel{border-color:var(--azul);background:var(--azul-claro);box-shadow:0 0 0 3px rgba(31,79,216,.12)}
+.opc.comp{padding:14px 6px 12px}
+.opc.comp .ico{color:var(--azul)}
+.opc.comp-agitado .ico{color:var(--tag-agitado)}
+.opc.comp-bravo .ico{color:var(--perigo)}
+.opc.comp-bravo.sel{border-color:var(--perigo);background:var(--perigo-claro);box-shadow:0 0 0 3px rgba(207,59,59,.12)}
+
+/* ---------- Avisos ---------- */
+.aviso{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;font-size:13.5px;font-weight:700;margin-top:10px;animation:surge .25s}
+.aviso .ico{margin-top:1px}
+.aviso p{margin:0}
+.aviso b{font-weight:900}
+.aviso-info{background:var(--azul-claro);color:var(--azul-escuro)}
+.aviso-alerta{background:var(--alerta-claro);color:var(--alerta)}
+.aviso-perigo{background:var(--perigo-claro);color:#9E2626}
+.aviso-ok{background:var(--ok-claro);color:#0D6B42}
+.faixa-oferta{display:flex;gap:8px;align-items:flex-start;background:var(--amarelo-claro);border:1px solid #F5E0A0;color:#6B5200;border-radius:12px;padding:8px 11px;font-size:12px;font-weight:700;margin-bottom:16px}
+.faixa-oferta .ico{width:16px;height:16px;margin-top:1px}
+.faixa-oferta em{font-style:normal;opacity:.8}
+
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;color:#fff;white-space:nowrap;line-height:1.3}
+.tag-braqui{background:var(--tag-braqui)}
+.tag-idoso{background:var(--tag-idoso)}
+.tag-agitado{background:var(--tag-agitado)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ---------- Serviços ---------- */
+.servico{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:2px solid var(--linha);border-radius:var(--raio);padding:16px;margin-bottom:10px;transition:border-color .18s, background .18s, box-shadow .18s}
+.servico .s-ico{width:48px;height:48px;border-radius:14px;background:var(--azul-claro);color:var(--azul);display:grid;place-items:center;flex:none}
+.servico .s-txt{flex:1;min-width:0}
+.servico b{display:block;font-size:17px;font-weight:900}
+.servico small{display:block;color:var(--suave);font-weight:700;font-size:13px}
+.servico .dur{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:12.5px;font-weight:800;color:var(--azul-escuro);background:var(--azul-claro);padding:3px 8px;border-radius:99px}
+.servico .dur .ico{width:13px;height:13px}
+.servico .radio{width:24px;height:24px;border-radius:50%;border:2px solid var(--linha);flex:none;display:grid;place-items:center;color:#fff}
+.servico.sel{border-color:var(--azul);background:#FAFCFF;box-shadow:0 0 0 3px rgba(31,79,216,.12)}
+.servico.sel .radio{background:var(--azul);border-color:var(--azul)}
+.servico .radio .ico{width:14px;height:14px;opacity:0}
+.servico.sel .radio .ico{opacity:1}
+
+/* ---------- Regras / calendário ---------- */
+.regras{background:#fff;border-radius:var(--raio);padding:14px;box-shadow:var(--sombra);border:1px solid var(--linha)}
+.regras-tit{display:flex;align-items:center;gap:8px;font-weight:900;font-size:14.5px;margin-bottom:8px;flex-wrap:wrap}
+.regras ul{margin:8px 0 0;padding:0;list-style:none}
+.regras li{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;font-weight:700;color:var(--suave);padding:3px 0}
+.regras li .ico{width:16px;height:16px;margin-top:2px;color:var(--azul)}
+.regras.livre{background:var(--ok-claro);border-color:#C3EAD4}
+.regras.livre .regras-tit{color:#0D6B42;margin:0}
+
+.cal-wrap,.horas-wrap{position:relative}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dia{position:relative;aspect-ratio:.8;border-radius:12px;background:#fff;border:2px solid var(--linha);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:800;transition:background .18s,border-color .18s,transform .12s;min-width:0}
+.dia small{font-size:10.5px;text-transform:uppercase;color:var(--suave);font-weight:900;letter-spacing:.3px}
+.dia b{font-size:17px;font-weight:900;line-height:1.1}
+.dia i{width:6px;height:6px;border-radius:50%;background:var(--ok);margin-top:2px}
+.dia .ico{width:12px;height:12px;margin-top:1px}
+.dia.on:active{transform:scale(.95)}
+.dia.off{background:#EEF1F6;color:#A3ACBE;border-style:dashed;border-color:#D7DDE8}
+.dia.off small{color:#A3ACBE}
+.dia.sel{background:var(--azul);border-color:var(--azul);color:#fff;box-shadow:0 6px 14px rgba(31,79,216,.3)}
+.dia.sel small{color:#D7E1FF}
+.dia.sel i{background:var(--amarelo)}
+.dia.hoje::after{content:'hoje';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--amarelo);color:#5a4300;font-size:9px;font-weight:900;padding:0 5px;border-radius:6px;line-height:14px}
+.cal-mes{font-size:12.5px;color:var(--suave);font-weight:800}
+
+.horas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hora{border-radius:12px;padding:9px 4px;background:#fff;border:2px solid var(--linha);text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;transition:background .18s,border-color .18s,transform .12s;min-width:0}
+.hora b{font-size:16px;font-weight:900}
+.hora small{font-size:11.5px;font-weight:800;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.hora.h-livre small{color:var(--ok)}
+.hora.h-livre:active{transform:scale(.96)}
+.hora.h-esgotado{background:#F4F5F8;border-color:#E5E8EF;color:#9DA6B8}
+.hora.h-esgotado b{text-decoration:line-through}
+.hora.h-esgotado small{color:var(--perigo)}
+.hora.h-calor{background:var(--alerta-claro);border-color:#F6DCA6;border-style:dashed;color:#B88A3A}
+.hora.h-calor small{color:var(--alerta)}
+.hora.h-passou{background:#F4F5F8;border-color:#E5E8EF;color:#B3BACA}
+.hora.sel{background:var(--azul);border-color:var(--azul);color:#fff;box-shadow:0 6px 14px rgba(31,79,216,.3)}
+.hora.sel small{color:#fff}
+.legenda{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;font-weight:700;color:var(--suave)}
+.legenda span{display:inline-flex;align-items:center;gap:5px}
+.legenda i{width:12px;height:12px;border-radius:4px;border:2px solid var(--linha);background:#fff}
+.legenda .l-esg{background:#F4F5F8}
+.legenda .l-calor{background:var(--alerta-claro);border-color:#F6DCA6;border-style:dashed}
+.legenda .l-off{background:#EEF1F6;border-style:dashed}
+.vazio-horas{background:#fff;border:2px dashed var(--linha);border-radius:14px;padding:18px;text-align:center;color:var(--suave);font-weight:700;font-size:13.5px}
+
+.balao{position:absolute;z-index:30;background:var(--tinta);color:#fff;font-size:12.5px;font-weight:800;line-height:1.3;padding:8px 11px;border-radius:10px;max-width:250px;width:max-content;transform:translate(-50%,-100%);pointer-events:none;box-shadow:0 8px 20px rgba(20,33,61,.3);animation:balao .18s ease-out}
+.balao::after{content:'';position:absolute;top:100%;left:var(--seta,50%);transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--tinta)}
+@keyframes balao{from{opacity:0;margin-top:6px}to{opacity:1;margin-top:0}}
+
+/* ---------- Resumo / confirmação ---------- */
+.resumo{background:#fff;border-radius:var(--raio);border:1px solid var(--linha);box-shadow:var(--sombra);overflow:hidden}
+.resumo-linha{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-top:1px solid var(--linha)}
+.resumo-linha:first-child{border-top:0}
+.resumo-linha .ico{color:var(--azul);margin-top:1px}
+.resumo-linha small{display:block;font-size:12px;color:var(--suave);font-weight:800}
+.resumo-linha b{font-weight:900}
+.resumo-linha div{min-width:0}
+.mini-resumo{display:flex;gap:10px;align-items:center;background:var(--azul-claro);border-radius:14px;padding:11px 13px;margin-bottom:18px;font-size:13.5px;font-weight:800;color:var(--azul-escuro)}
+.mini-resumo .ico{flex:none}
+
+.check-ok{width:84px;height:84px;margin:6px auto 12px;border-radius:50%;background:var(--ok);display:grid;place-items:center;box-shadow:0 0 0 10px var(--ok-claro);animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.check-ok svg{width:44px;height:44px;color:#fff}
+.check-ok path{stroke-dasharray:30;stroke-dashoffset:30;animation:traco .45s .25s forwards}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes traco{to{stroke-dashoffset:0}}
+.centro{text-align:center}
+.pilha{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+
+.campo>.caixa-check,.caixa-check{display:flex;gap:12px;align-items:flex-start;background:#fff;border:2px solid var(--linha);border-radius:14px;padding:14px;cursor:pointer;font-weight:800;font-size:14.5px;margin-top:12px}
+.caixa-check input{width:24px;height:24px;margin:0;accent-color:var(--azul);flex:none}
+.campo.erro .caixa-check{border-color:var(--perigo)}
+details.porque{margin-top:8px;font-size:13px}
+details.porque summary{cursor:pointer;font-weight:800;color:var(--alerta);list-style:none;display:inline-flex;align-items:center;gap:4px}
+details.porque summary::-webkit-details-marker{display:none}
+details.porque p{margin:6px 0 0;font-weight:700}
+
+.icone-grande{width:76px;height:76px;border-radius:24px;display:grid;place-items:center;margin:8px auto 14px}
+.icone-grande svg{width:40px;height:40px}
+
+/* ---------- Toast ---------- */
+#camada{position:absolute;inset:0;pointer-events:none;z-index:50}
+.toast{position:absolute;left:16px;right:16px;bottom:120px;background:var(--tinta);color:#fff;border-radius:14px;padding:12px 14px;font-weight:800;font-size:13.5px;box-shadow:0 12px 30px rgba(20,33,61,.35);display:flex;gap:10px;align-items:flex-start;animation:surge .25s;pointer-events:auto}
+.toast.t-ok{background:#0F7A4B}
+.toast.t-novo{background:var(--azul);top:76px;bottom:auto}
+
+/* ---------- Simulação de conversa ---------- */
+.topo-wa{background:var(--wa-topo);gap:10px;padding:10px 12px}
+.wa-voltar{opacity:.9}
+.wa-avatar{width:40px;height:40px;border-radius:50%;background:var(--amarelo);color:var(--azul-escuro);display:grid;place-items:center;flex:none}
+.wa-avatar .ico{width:22px;height:22px}
+.wa-contato{min-width:0;flex:1}
+.wa-contato b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wa-contato small{display:block;font-size:12.5px;opacity:.85}
+.wa-icones{display:flex;gap:14px;opacity:.9}
+.rolagem.wa-bg{background-color:var(--wa-fundo);background-image:radial-gradient(rgba(120,100,80,.08) 1.2px,transparent 1.3px);background-size:18px 18px}
+.wa-chat{padding:12px 12px 70px;min-height:100%;display:flex;flex-direction:column}
+.wa-data{align-self:center;background:#E1F0FA;color:#4C6170;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;margin:4px 0 12px;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.wa-msgs{display:flex;flex-direction:column;gap:6px}
+.wa-msg{max-width:86%;padding:7px 9px 5px;border-radius:10px;font-size:15px;line-height:1.38;box-shadow:0 1px 1px rgba(0,0,0,.08);animation:surge .25s;position:relative}
+.wa-msg p{margin:0 0 6px}
+.wa-msg.env{align-self:flex-end;background:var(--wa-enviada);border-top-right-radius:3px}
+.wa-msg.rec{align-self:flex-start;background:var(--wa-recebida);border-top-left-radius:3px}
+.wa-hora{display:flex;justify-content:flex-end;align-items:center;gap:3px;font-size:11px;color:#667781;margin-top:-2px}
+.wa-msg.env p{margin:0 54px 0 0}
+.wa-msg.env .wa-hora{position:absolute;right:8px;bottom:5px}
+.ticks .ico{width:16px;height:16px;color:#8696A0;transition:color .3s}
+.ticks.lido .ico{color:#34B7F1}
+.wa-auto{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--wa-topo);margin-bottom:4px}
+.wa-auto .ico{width:12px;height:12px}
+.wa-card{display:flex;gap:10px;align-items:center;background:#F0F4F8;border-left:4px solid var(--azul);border-radius:8px;padding:10px;text-decoration:none;color:var(--tinta);margin:2px 0 8px}
+.wa-card-ico{width:40px;height:40px;border-radius:10px;background:var(--azul);color:#fff;display:grid;place-items:center;flex:none}
+.wa-card b{display:block;font-size:14.5px}
+.wa-card small{display:block;font-size:12px;color:var(--suave);font-weight:700}
+.wa-link{color:var(--wa-link);font-weight:800;text-decoration:underline}
+.wa-link.dedo,.wa-card.dedo{animation:chama 1.4s ease-in-out infinite}
+@keyframes chama{0%,100%{box-shadow:0 0 0 0 rgba(31,79,216,0)}50%{box-shadow:0 0 0 5px rgba(31,79,216,.18)}}
+.wa-mini{font-size:12.5px;color:#54656F}
+.digitando{display:flex;gap:4px;padding:12px 14px}
+.digitando i{width:7px;height:7px;border-radius:50%;background:#9AA7AF;animation:pula 1s infinite}
+.digitando i:nth-child(2){animation-delay:.15s}
+.digitando i:nth-child(3){animation-delay:.3s}
+@keyframes pula{0%,60%,100%{transform:none;opacity:.6}30%{transform:translateY(-4px);opacity:1}}
+.wa-repetir{position:absolute;right:12px;bottom:12px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.7);color:#667781;display:grid;place-items:center;opacity:.55}
+.wa-repetir .ico{width:16px;height:16px}
+.acoes-wa{background:transparent;border:0;padding:8px 10px;gap:8px;align-items:center;background:var(--wa-fundo)}
+.wa-input{flex:1;height:46px;border-radius:24px;background:#fff;display:flex;align-items:center;padding:0 18px;color:#8A979F;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.wa-mic{width:46px;height:46px;border-radius:50%;background:var(--wa-topo);color:#fff;display:grid;place-items:center;flex:none}
+
+/* ---------- Painel ---------- */
+.abas{flex:none;display:flex;gap:6px;background:#fff;padding:8px 12px;border-bottom:1px solid var(--linha)}
+.aba{flex:1;min-height:42px;border-radius:12px;font-weight:800;font-size:14px;color:var(--suave);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.aba.sel{background:var(--azul-claro);color:var(--azul)}
+.resumo-dia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:10px 12px}
+.kpi b{display:block;font-size:22px;font-weight:900;line-height:1.1}
+.kpi small{font-size:11.5px;font-weight:800;color:var(--suave)}
+.barra-ferr{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.seg{display:inline-flex;background:#E7ECF5;border-radius:12px;padding:3px}
+.seg button{padding:8px 14px;border-radius:9px;font-weight:800;font-size:13.5px;color:var(--suave)}
+.seg button.sel{background:#fff;color:var(--azul);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.barra-ferr .btn{margin-left:auto}
+.chips-dias{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chips-dias::-webkit-scrollbar{display:none}
+.chip-dia{flex:none;min-width:58px;border-radius:12px;background:#fff;border:2px solid var(--linha);padding:6px 8px;text-align:center}
+.chip-dia small{display:block;font-size:10.5px;font-weight:900;text-transform:uppercase;color:var(--suave)}
+.chip-dia b{display:block;font-size:16px;font-weight:900}
+.chip-dia em{display:block;font-style:normal;font-size:11px;font-weight:800;color:var(--azul)}
+.chip-dia.sel{background:var(--azul);border-color:var(--azul);color:#fff}
+.chip-dia.sel small,.chip-dia.sel em{color:#E0E8FF}
+.chip-dia.fechado{opacity:.5}
+.bloco-dia{margin-bottom:18px}
+.bloco-dia h3{font-size:14.5px;font-weight:900;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.bloco-dia h3 small{margin-left:auto;font-size:12px;color:var(--suave);font-weight:800;white-space:nowrap}
+.slot-linha{display:flex;gap:10px;margin-bottom:8px}
+.slot-h{flex:none;width:54px;padding-top:10px;font-weight:900;font-size:14px}
+.slot-h small{display:block;font-size:11px;color:var(--suave);font-weight:800}
+.slot-h small.cheio{color:var(--perigo)}
+.slot-cards{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ag{background:#fff;border:1px solid var(--linha);border-left:4px solid var(--azul);border-radius:12px;padding:10px 12px;box-shadow:0 2px 6px rgba(20,33,61,.04)}
+.ag.concluido{border-left-color:var(--ok);opacity:.75}
+.ag.cancelado{border-left-color:#B8C0CF;opacity:.55}
+.ag.cancelado .ag-top b{text-decoration:line-through}
+.ag.novo{animation:destaque 2.6s ease-out}
+@keyframes destaque{0%{background:#FFF1B8;box-shadow:0 0 0 4px rgba(255,198,41,.6);transform:scale(1.02)}100%{background:#fff;box-shadow:0 2px 6px rgba(20,33,61,.04);transform:none}}
+.ag-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ag-top b{font-size:15.5px;font-weight:900}
+.ag-raca{font-size:13px;font-weight:700;color:var(--suave)}
+.origem{margin-left:auto;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;padding:2px 7px;border-radius:6px;background:var(--azul-claro);color:var(--azul)}
+.origem.balcao{background:#F0ECFF;color:#5A3FCC}
+.ag-meta{font-size:12.5px;color:var(--suave);font-weight:700;margin:3px 0 6px}
+.ag-acoes{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.ag-acoes button{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:800;padding:6px 10px;border-radius:9px;background:#F1F4FA;color:var(--tinta)}
+.ag-acoes .b-ok{background:var(--ok-claro);color:#0D6B42}
+.ag-acoes .b-x{background:var(--perigo-claro);color:#9E2626}
+.ag-acoes .ico{width:14px;height:14px}
+.status-pill{font-size:11.5px;font-weight:900;padding:4px 9px;border-radius:99px}
+.status-pill.concluido{background:var(--ok-claro);color:#0D6B42}
+.status-pill.cancelado{background:#EEF1F6;color:var(--suave)}
+.vazio{background:#fff;border:2px dashed var(--linha);border-radius:12px;padding:12px;text-align:center;color:var(--suave);font-weight:700;font-size:13px}
+@media (min-width:900px){ body.largo .grade-semana{display:grid;grid-template-columns:1fr 1fr;gap:0 18px} }
+
+.cfg-card{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:14px;margin-bottom:12px}
+.cfg-linha{display:flex;align-items:center;gap:12px}
+.cfg-linha .txt{flex:1;min-width:0}
+.cfg-linha b{display:block;font-weight:900;font-size:15px}
+.cfg-linha small{display:block;font-size:12.5px;color:var(--suave);font-weight:700}
+.switch{position:relative;width:52px;height:30px;flex:none}
+.switch input{opacity:0;width:100%;height:100%;margin:0;position:absolute;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:99px;background:#C9D1DE;transition:background .2s}
+.switch span::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.switch input:checked+span{background:var(--azul)}
+.switch input:checked+span::after{transform:translateX(22px)}
+.faixa-hora{display:flex;align-items:center;gap:8px;margin-top:12px;font-weight:800;font-size:14px;flex-wrap:wrap}
+.sel-inp{height:42px;border:2px solid var(--linha);border-radius:11px;background:#fff;padding:0 10px;font-weight:800;font-size:15px}
+.num-inp{width:74px;height:42px;border:2px solid var(--linha);border-radius:11px;text-align:center;font-weight:900;font-size:16px}
+.dias-toggle{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dias-toggle button{min-width:48px;height:40px;border-radius:11px;border:2px solid var(--linha);background:#fff;font-weight:900;font-size:13.5px;text-transform:capitalize}
+.dias-toggle button.sel{background:var(--azul);border-color:var(--azul);color:#fff}
+.racas-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.raca-chip{display:inline-flex;align-items:center;gap:4px;background:#FFF0EA;color:#A33A16;border-radius:99px;padding:5px 6px 5px 11px;font-weight:800;font-size:13px}
+.raca-chip button{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#A33A16}
+.raca-chip .ico{width:13px;height:13px}
+.add-raca{display:flex;gap:8px;margin-top:10px}
+.add-raca .inp{height:44px;font-size:15px}
+
+/* ---------- Modal ---------- */
+.modal-fundo{position:absolute;inset:0;background:rgba(15,24,45,.45);pointer-events:auto;display:flex;align-items:flex-end;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{background:var(--fundo);width:100%;max-height:92%;overflow-y:auto;border-radius:22px 22px 0 0;padding:16px 16px 20px;animation:sobe .28s cubic-bezier(.2,.8,.2,1)}
+body.largo .modal{max-width:520px;margin:0 auto;border-radius:22px 22px 0 0}
+@keyframes sobe{from{transform:translateY(40px);opacity:.4}}
+.modal-topo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.modal-topo h2{margin:0;font-size:18px;font-weight:900;flex:1}
+.modal-topo button{width:36px;height:36px;border-radius:12px;background:#fff;display:grid;place-items:center}
+.grade2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.modal .campo{margin-bottom:12px}
+.modal .campo>label{font-size:13px;margin-bottom:5px}
+.modal .inp,.modal select.inp{height:46px;font-size:15px}
+select.inp{padding:0 10px;appearance:auto}
+
+@media (max-width:370px){
+  .marca span{font-size:15px}
+  .btn-equipe span{display:none}
+  .btn-equipe{padding:8px}
+  .btn-equipe .ico{width:18px;height:18px}
+  .marca .selo{width:34px;height:34px}
+  .tit{font-size:21px}
+  .opc small{font-size:10.5px}
+  .dia b{font-size:15px}
+  .dia small{font-size:9.5px}
+  .cal{gap:5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <header class="topo" id="topo"></header>
+  <div id="prog"></div>
+  <main class="rolagem" id="rolagem"><div id="tela"></div></main>
+  <div class="acoes" id="acoes"></div>
+  <footer class="rodape">
+    Demonstração criada pela <a href="https://www.wohaos.com" target="_blank" rel="noopener">WOHAOS</a> · wohaos.com
+    <small>Protótipo para apresentação — não é o sistema oficial em funcionamento</small>
+  </footer>
+  <div id="camada"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   DADOS FIXOS
+   ============================================================ */
+var WA_BANHO = '5541985355195';     // (41) 98535-5195
+var WA_CLINICA = '5541995752003';   // (41) 99575-2003
+var K_CFG = 'mp_demo_config_v1';
+var K_AGS = 'mp_demo_agendamentos_v1';
+
+var BRAQUI_PADRAO = ['Pug','Bulldog Francês','Bulldog Inglês','Shih Tzu','Lhasa Apso','Boston Terrier','Pequinês','Boxer','Cavalier King Charles'];
+var CFG_PADRAO = { verao:true, quenteIni:13, quenteFim:16, idadeIdoso:8, vagas:2, diasSensiveis:[1,2,3], braqui:BRAQUI_PADRAO.slice() };
+
+var RACAS_BASE = [
+  ['Pug','P'],['Bulldog Francês','P'],['Bulldog Inglês','M'],['Shih Tzu','P'],['Lhasa Apso','P'],['Boston Terrier','P'],
+  ['Pequinês','P'],['Boxer','G'],['Cavalier King Charles','P'],
+  ['Poodle','P'],['Yorkshire','P'],['Maltês','P'],['Spitz Alemão (Lulu)','P'],['Chihuahua','P'],['Pinscher','P'],
+  ['Dachshund (Salsicha)','P'],['Bichon Frisé','P'],['Schnauzer','M'],['Beagle','M'],['Cocker Spaniel','M'],
+  ['Border Collie','M'],['Pit Bull','M'],['Chow Chow','M'],['Golden Retriever','G'],['Labrador','G'],['Pastor Alemão','G'],
+  ['Husky Siberiano','G'],['Rottweiler','G'],['Akita','G'],['São Bernardo','GG'],['Dogue Alemão','GG'],['Bernese','GG']
+];
+var SRD = 'SRD / Outra';
+var PORTES = { P:'até 10 kg', M:'10 a 25 kg', G:'25 a 45 kg', GG:'mais de 45 kg' };
+var PORTE_NOME = { P:'pequeno', M:'médio', G:'grande', GG:'gigante' };
+var COMP = {
+  calmo:   { nome:'Calmo',   desc:'Tranquilo no banho', ico:'sorriso' },
+  agitado: { nome:'Agitado', desc:'Fica inquieto',      ico:'raio' },
+  bravo:   { nome:'Bravo',   desc:'Morde ou rosna',     ico:'bravo' }
+};
+var SERVICOS = {
+  banho:      { nome:'Banho',          desc:'Banho completo e secagem',      ico:'gota',    dur:{P:60,M:90,G:120,GG:150} },
+  banho_tosa: { nome:'Banho e tosa',   desc:'Banho completo + tosa',         ico:'tesoura', dur:{P:90,M:120,G:150,GG:180} },
+  higienica:  { nome:'Tosa higiênica', desc:'Patas, barriga e região íntima', ico:'brilho',  dur:{P:40,M:50,G:60,GG:75} }
+};
+var DIAS_CURTO = ['dom','seg','ter','qua','qui','sex','sáb'];
+var DIAS_PLURAL = ['domingos','segundas','terças','quartas','quintas','sextas','sábados'];
+var DIAS_FEIRA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var NOMES_PET = ['Thor','Mel','Luna','Bob','Nina','Fred','Belinha','Pipoca','Max','Amora','Toby','Lola','Paçoca','Zeus','Maya','Billy','Cookie','Frida','Theo','Kiara','Bento','Jade','Ozzy','Cacau'];
+var TUTORES = ['Ana','Carlos','Fernanda','Rafael','Juliana','Marcos','Patrícia','Diego','Camila','Bruno','Letícia','André','Beatriz','Gustavo','Larissa','Paulo'];
+
+/* ============================================================
+   ÍCONES (SVG inline)
+   ============================================================ */
+var PATHS = {
+  pata:'<circle cx="5.5" cy="10" r="2"/><circle cx="9" cy="5.5" r="2"/><circle cx="15" cy="5.5" r="2"/><circle cx="18.5" cy="10" r="2"/><path d="M12 11.5c-2.8 0-6 3.6-6 6.1 0 1.6 1.3 2.6 3 2.6 1.2 0 2-.6 3-.6s1.8.6 3 .6c1.7 0 3-1 3-2.6 0-2.5-3.2-6.1-6-6.1z"/>',
+  voltar:'<path d="M15 18l-6-6 6-6"/>',
+  seta:'<path d="M9 18l6-6-6-6"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  dcheck:'<path d="M1.5 12.5l4 4L13 9M10 16l.5.5L18.5 9"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+  relogio:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  carro:'<path d="M5 17H4.5A1.5 1.5 0 0 1 3 15.5V12l2-4.7A2 2 0 0 1 6.8 6h10.4a2 2 0 0 1 1.8 1.3L21 12v3.5a1.5 1.5 0 0 1-1.5 1.5H19M3 12h18M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+  alerta:'<path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  cadeado:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  chat:'<path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z"/>',
+  tesoura:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1L20 20M8.1 15.9L20 4"/>',
+  gota:'<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/>',
+  brilho:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+  usuario:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  tel:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  ajustes:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  lista:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+  mais:'<path d="M12 5v14M5 12h14"/>',
+  refresh:'<path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/>',
+  sol:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  raio:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  sorriso:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/>',
+  bravo:'<circle cx="12" cy="12" r="9"/><path d="M8.5 16.5a4.5 4.5 0 0 1 7 0M7.5 8.5l3 1.5M16.5 8.5l-3 1.5"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  clinica:'<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/>',
+  vento:'<path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>',
+  tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+  busca:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  pontos:'<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  escudo:'<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M12 9v6M9 12h6"/>',
+  desfazer:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
+};
+function ico(n, cls){ return '<svg class="ico '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(PATHS[n]||'')+'</svg>'; }
+
+/* ============================================================
+   ARMAZENAMENTO (localStorage com fallback em memória)
+   ============================================================ */
+var mem = {};
+var store = {
+  get: function(k){
+    try { var v = window.localStorage.getItem(k); if (v !== null) return v; } catch(e) {}
+    return Object.prototype.hasOwnProperty.call(mem,k) ? mem[k] : null;
+  },
+  set: function(k,v){
+    mem[k] = v;
+    try { window.localStorage.setItem(k,v); } catch(e) {}
+  }
+};
+function lerJSON(k){ var s = store.get(k); if (!s) return null; try { return JSON.parse(s); } catch(e){ return null; } }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+var cfg, ags, ultCfg = null, ultAgs = null;
+function salvarCfg(){ ultCfg = JSON.stringify(cfg); store.set(K_CFG, ultCfg); }
+function salvarAgs(){ ultAgs = JSON.stringify(ags); store.set(K_AGS, ultAgs); }
+function normalizarCfg(c){
+  var r = Object.assign(clone(CFG_PADRAO), c || {});
+  if (!Array.isArray(r.braqui)) r.braqui = BRAQUI_PADRAO.slice();
+  if (!Array.isArray(r.diasSensiveis)) r.diasSensiveis = [1,2,3];
+  r.quenteIni = +r.quenteIni; r.quenteFim = +r.quenteFim; r.idadeIdoso = +r.idadeIdoso; r.vagas = Math.max(1, +r.vagas || 1);
+  return r;
+}
+function carregar(){
+  cfg = normalizarCfg(lerJSON(K_CFG));
+  ags = lerJSON(K_AGS);
+  var hojeS = ymd(new Date());
+  if (!Array.isArray(ags) || !ags.some(function(a){ return a.data >= hojeS; })) {
+    ags = gerarExemplos();
+    salvarAgs();
+  }
+  if (!store.get(K_CFG)) salvarCfg();
+  ultCfg = store.get(K_CFG); ultAgs = store.get(K_AGS);
+}
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function norm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function ymd(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parse(s){ var p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
+function hoje0(){ var d = new Date(); d.setHours(0,0,0,0); return d; }
+function proximosDias(n){ var a=[], b=hoje0(); for (var i=0;i<n;i++){ var d=new Date(b); d.setDate(b.getDate()+i); a.push(d); } return a; }
+function hh(h){ return pad(h)+':00'; }
+function dataCurta(s){ var d = parse(s); return DIAS_CURTO[d.getDay()]+', '+pad(d.getDate())+'/'+pad(d.getMonth()+1); }
+function dataLonga(s){ var d = parse(s); return DIAS_FEIRA[d.getDay()]+', '+d.getDate()+' de '+MESES[d.getMonth()]; }
+function fmtDur(m){ if (m < 60) return m+' min'; var h = Math.floor(m/60), r = m%60; return h+'h'+(r ? pad(r) : ''); }
+function idadeTxt(i){ i = +i; return i < 1 ? 'menos de 1 ano' : (i === 1 ? '1 ano' : i+' anos'); }
+function juntar(a){ return a.length <= 1 ? a.join('') : a.slice(0,-1).join(', ')+' e '+a[a.length-1]; }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function diasOrdenados(){ return cfg.diasSensiveis.slice().sort(function(a,b){return a-b;}); }
+function listaDias(){ return juntar(diasOrdenados().map(function(i){ return DIAS_PLURAL[i]; })); }
+function listaDiasCurto(){ return juntar(diasOrdenados().map(function(i){ return DIAS_CURTO[i]; })); }
+function waLink(num, msg){ return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg); }
+function hash(s){ var h = 2166136261; for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mascaraTel(v){
+  var d = String(v).replace(/\D/g,'').slice(0,11);
+  if (d.length === 0) return '';
+  if (d.length <= 2) return '('+d;
+  if (d.length <= 6) return '('+d.slice(0,2)+') '+d.slice(2);
+  if (d.length <= 10) return '('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6);
+  return '('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7);
+}
+function todasRacas(){
+  var nomes = RACAS_BASE.map(function(r){ return r[0]; });
+  cfg.braqui.forEach(function(b){ if (!nomes.some(function(n){ return norm(n) === norm(b); })) nomes.push(b); });
+  nomes.sort(function(a,b){ return a.localeCompare(b,'pt-BR'); });
+  return nomes;
+}
+function porteSugerido(raca){ var r = RACAS_BASE.find(function(x){ return x[0] === raca; }); return r ? r[1] : ''; }
+
+/* ============================================================
+   REGRAS DE NEGÓCIO
+   ============================================================ */
+function ehBraqui(raca){ if (!raca) return false; var x = norm(raca); return cfg.braqui.some(function(b){ return norm(b) === x; }); }
+function flagsDe(p){
+  var idade = (p.idade === '' || p.idade == null) ? null : +p.idade;
+  return { braqui: ehBraqui(p.raca), idoso: idade !== null && idade >= cfg.idadeIdoso, agitado: p.comp === 'agitado', bravo: p.comp === 'bravo' };
+}
+function sensivel(f){ return f.braqui || f.idoso || f.agitado; }
+function nomesSensiveis(f){
+  var a = [];
+  if (f.braqui) a.push('braquicefálicos');
+  if (f.idoso) a.push('pets idosos ('+cfg.idadeIdoso+'+ anos)');
+  if (f.agitado) a.push('pets agitados');
+  return a;
+}
+function horario(dow){ if (dow === 0) return null; if (dow === 6) return [9,17]; return [9,19]; }
+function horasDoDia(data){ var r = horario(parse(data).getDay()); if (!r) return []; var a=[]; for (var h=r[0]; h<r[1]; h++) a.push(h); return a; }
+function ocupacao(data, h){ return ags.filter(function(a){ return a.data === data && a.hora === h && a.status !== 'cancelado'; }).length; }
+function emCalor(h){ return cfg.verao && h >= cfg.quenteIni && h < cfg.quenteFim; }
+function estadoHorario(data, h, f){
+  var agora = new Date();
+  if (ymd(agora) === data && h <= agora.getHours()) return { s:'passou', motivo:'Esse horário já passou' };
+  if (f && f.braqui && emCalor(h)) return { s:'calor', motivo:'Modo verão: braquicefálicos não são atendidos das '+cfg.quenteIni+'h às '+cfg.quenteFim+'h, por causa do calor' };
+  var livres = cfg.vagas - ocupacao(data, h);
+  if (livres <= 0) return { s:'esgotado', motivo:'Horário esgotado — todas as vagas já foram reservadas' };
+  return { s:'livre', livres: livres };
+}
+function estadoDia(data, f){
+  var dow = parse(data).getDay();
+  if (!horario(dow)) return { ok:false, motivo:'Fechado aos domingos' };
+  if (f && sensivel(f) && cfg.diasSensiveis.indexOf(dow) < 0) {
+    var quem = cap(juntar(nomesSensiveis(f)));
+    return { ok:false, motivo: cfg.diasSensiveis.length ? quem+' só às '+listaDias() : quem+': agendamento online pausado' };
+  }
+  var hs = horasDoDia(data).map(function(h){ return estadoHorario(data, h, f); });
+  if (!hs.some(function(x){ return x.s === 'livre'; })) {
+    var todosPassaram = hs.every(function(x){ return x.s === 'passou'; });
+    return { ok:false, motivo: todosPassaram ? 'O expediente de hoje já encerrou' : 'Sem horários livres neste dia' };
+  }
+  return { ok:true };
+}
+function alertasDe(a){
+  var f = flagsDe(a), out = [];
+  if (f.braqui) out.push('Braquicefálico: vir de carro com ar-condicionado (não pode vir caminhando; o Taxi Dog não transporta)');
+  if (f.idoso) out.push('Pet idoso ('+idadeTxt(a.idade)+')');
+  if (f.agitado) out.push('Pet agitado: separar tempo extra de manejo');
+  return out;
+}
+
+/* ============================================================
+   DADOS DE EXEMPLO
+   ============================================================ */
+function gerarExemplos(){
+  var out = [], n = 0, agoraH = new Date().getHours();
+  var calmas = RACAS_BASE.filter(function(r){ return BRAQUI_PADRAO.indexOf(r[0]) < 0; });
+  var servs = ['banho','banho','banho_tosa','higienica'];
+  proximosDias(14).forEach(function(d, i){
+    var data = ymd(d), dow = d.getDay();
+    var sensDia = CFG_PADRAO.diasSensiveis.indexOf(dow) >= 0;
+    horasDoDia(data).forEach(function(h){
+      var r = hash(data+'|'+h) % 100;
+      var q = r < 20 ? 2 : (r < 52 ? 1 : 0);
+      if (i === 0 && q === 0 && h % 2 === 0) q = 1;
+      for (var k=0; k<q; k++){
+        var s = hash(data+'#'+h+'#'+k);
+        var raca = RACAS_BASE[s % RACAS_BASE.length][0];
+        var idade = 1 + ((s >>> 5) % 13);
+        var comp = ['calmo','calmo','calmo','agitado'][(s >>> 9) % 4];
+        var quente = h >= CFG_PADRAO.quenteIni && h < CFG_PADRAO.quenteFim;
+        if (BRAQUI_PADRAO.indexOf(raca) >= 0 && (!sensDia || quente)) raca = calmas[s % calmas.length][0];
+        if (!sensDia){ if (idade >= CFG_PADRAO.idadeIdoso) idade = (idade % 7) + 1; comp = 'calmo'; }
+        out.push({
+          id:'ex'+(++n), pet:NOMES_PET[(s >>> 3) % NOMES_PET.length], raca:raca, idade:idade, porte:porteSugerido(raca) || 'M', comp:comp,
+          servico:servs[(s >>> 13) % 4], data:data, hora:h, tutor:TUTORES[(s >>> 7) % TUTORES.length], tel:'',
+          origem: ((s >>> 11) % 3 === 0) ? 'balcao' : 'online',
+          status: (i === 0 && h < agoraH) ? 'concluido' : 'agendado', criado: 0
+        });
+      }
+    });
+  });
+  return out;
+}
+
+/* ============================================================
+   ELEMENTOS
+   ============================================================ */
+var $phone = document.getElementById('phone');
+var $topo = document.getElementById('topo');
+var $prog = document.getElementById('prog');
+var $rol = document.getElementById('rolagem');
+var $tela = document.getElementById('tela');
+var $acoes = document.getElementById('acoes');
+var $camada = document.getElementById('camada');
+
+function animar(dir){
+  $tela.classList.remove('anima-frente','anima-tras');
+  void $tela.offsetWidth;
+  $tela.classList.add(dir < 0 ? 'anima-tras' : 'anima-frente');
+}
+function setAcoes(html, cls){ $acoes.className = 'acoes'+(cls ? ' '+cls : ''); $acoes.innerHTML = html || ''; $acoes.hidden = !html; }
+
+var toastTimer = null;
+function toast(msg, tipo, ms){
+  var old = $camada.querySelector('.toast'); if (old) old.remove();
+  var t = document.createElement('div');
+  t.className = 'toast'+(tipo ? ' t-'+tipo : '');
+  t.setAttribute('role','status');
+  t.innerHTML = ico(tipo === 'ok' ? 'check' : (tipo === 'novo' ? 'cal' : 'info')) + '<span>'+msg+'</span>';
+  $camada.appendChild(t);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.remove(); }, ms || 2800);
+}
+
+var balaoTimer = null;
+function balao(el, texto){
+  var wrap = el.closest('.cal-wrap, .horas-wrap'); if (!wrap) return;
+  var old = document.querySelector('.balao'); if (old) old.remove();
+  var b = document.createElement('div');
+  b.className = 'balao'; b.setAttribute('role','status'); b.textContent = texto;
+  wrap.appendChild(b);
+  var wr = wrap.getBoundingClientRect(), er = el.getBoundingClientRect();
+  var cx = er.left - wr.left + er.width/2;
+  var bw = b.offsetWidth, min = bw/2 + 2, max = wrap.clientWidth - bw/2 - 2;
+  var left = Math.max(min, Math.min(max, cx));
+  b.style.left = left+'px';
+  b.style.top = (er.top - wr.top - 8)+'px';
+  b.style.setProperty('--seta', (bw/2 + (cx - left))+'px');
+  clearTimeout(balaoTimer);
+  balaoTimer = setTimeout(function(){ b.remove(); }, 2800);
+}
+
+/* ============================================================
+   TELA 0 — SIMULAÇÃO DE CONVERSA
+   ============================================================ */
+var waTimers = [];
+function limparWa(){ waTimers.forEach(clearTimeout); waTimers = []; }
+function agoraHM(){ var d = new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function renderWhats(){
+  limparWa();
+  document.body.classList.remove('largo');
+  $topo.className = 'topo topo-wa';
+  $topo.innerHTML = '<span class="wa-voltar">'+ico('voltar')+'</span><div class="wa-avatar">'+ico('pata')+'</div>'+
+    '<div class="wa-contato"><b>Mundo Pet · Banho e Tosa</b><small id="wa-status">online</small></div>'+
+    '<span class="wa-icones">'+ico('tel')+ico('pontos')+'</span>';
+  $prog.className = ''; $prog.innerHTML = '';
+  $rol.classList.add('wa-bg');
+  $tela.style.padding = '0';
+  $tela.className = '';
+  $tela.innerHTML = '<div class="wa-chat"><div class="wa-data">Hoje</div><div id="wa-msgs" class="wa-msgs"></div></div>'+
+    '<button class="wa-repetir" data-act="wa-repetir" aria-label="Repetir animação">'+ico('refresh')+'</button>';
+  setAcoes('<div class="wa-input">Mensagem</div><span class="wa-mic">'+ico('mic')+'</span>', 'acoes-wa');
+  tocarWa();
+}
+function tocarWa(){
+  limparWa();
+  var box = document.getElementById('wa-msgs'); if (!box) return;
+  box.innerHTML = '';
+  var st = document.getElementById('wa-status');
+  var hora = agoraHM();
+  function add(html){ var d = document.createElement('div'); d.innerHTML = html; var el = d.firstChild; box.appendChild(el); $rol.scrollTop = $rol.scrollHeight; return el; }
+  function t(ms, fn){ waTimers.push(setTimeout(fn, ms)); }
+  t(500, function(){
+    var m = add('<div class="wa-msg env"><p>Oi, quero agendar banho</p><span class="wa-hora">'+hora+' <i class="ticks">'+ico('dcheck')+'</i></span></div>');
+    t(900, function(){ var tk = m.querySelector('.ticks'); if (tk) tk.classList.add('lido'); });
+  });
+  t(1300, function(){ if (st) st.textContent = 'digitando…'; add('<div class="wa-msg rec digitando" id="wa-dig"><i></i><i></i><i></i></div>'); });
+  t(2400, function(){
+    var dg = document.getElementById('wa-dig'); if (dg) dg.remove();
+    if (st) st.textContent = 'online';
+    add('<div class="wa-msg rec" id="wa-resposta">'+
+      '<span class="wa-auto">'+ico('raio')+' Mensagem automática</span>'+
+      '<p>Olá! 💙💛 Aqui é o <b>Mundo Pet Banho e Tosa</b>.</p>'+
+      '<p>Agora você mesmo agenda pelo link: escolhe o serviço, o dia e o horário — e a confirmação chega na hora, sem esperar resposta.</p>'+
+      '<a class="wa-card" href="#agendar" data-act="ir-agendar"><span class="wa-card-ico">'+ico('cal')+'</span><span><b>Agende aqui em 1 minuto</b><small>Banho · Banho e tosa · Tosa higiênica</small></span></a>'+
+      '<p><a class="wa-link" id="wa-link" href="#agendar" data-act="ir-agendar">👉 Agende aqui em 1 minuto</a></p>'+
+      '<p class="wa-mini">Seg a sex, 9h às 19h · sáb até 17h</p>'+
+      '<span class="wa-hora">'+hora+'</span></div>');
+  });
+  t(3300, function(){ var c = document.querySelector('.wa-card'); if (c) c.classList.add('dedo'); });
+}
+
+/* ============================================================
+   FLUXO DO TUTOR (WIZARD)
+   ============================================================ */
+var W;
+function novoWizard(){
+  W = { passo:1, pet:{ nome:'', raca:'', idade:'', porte:'', comp:'' }, servico:'', data:'', hora:null, tutor:'', tel:'', carro:false, ultimo:null, porteAuto:false };
+}
+novoWizard();
+var ROTULOS = { 1:'Seu pet', 2:'Serviço', 3:'Data e horário', 4:'Seus dados' };
+
+function topoApp(){
+  $topo.className = 'topo';
+  $topo.innerHTML = '<div class="marca"><div class="selo">'+ico('pata')+'</div><div><span>Mundo Pet — Banho e Tosa</span><small>Agendamento online</small></div></div>'+
+    '<button class="btn-equipe" data-act="equipe" aria-label="Área da equipe">'+ico('usuario')+'<span>Equipe</span></button>';
+}
+
+function renderWizard(opts){
+  opts = opts || {};
+  limparWa();
+  if (opts.anim !== false || opts.dir) { var tt = $camada.querySelector('.toast'); if (tt) tt.remove(); }
+  document.body.classList.remove('largo');
+  $rol.classList.remove('wa-bg');
+  $tela.style.padding = '';
+  topoApp();
+  var p = W.passo;
+  if (typeof p === 'number' && p <= 4) {
+    $prog.className = 'prog';
+    $prog.innerHTML = '<div class="prog-info"><span>Etapa <b>'+p+'</b> de 4 · '+ROTULOS[p]+'</span><span>'+(p*25)+'%</span></div><div class="prog-barra"><i style="width:'+(p*25)+'%"></i></div>';
+  } else { $prog.className = ''; $prog.innerHTML = ''; }
+
+  var scroll = $rol.scrollTop;
+  var html = '', acoes = '';
+  if (p === 1) { html = htmlPasso1(); acoes = '<button class="btn btn-pri" data-act="continuar">Continuar '+ico('seta')+'</button>'; }
+  else if (p === 2) { html = htmlPasso2(); acoes = '<button class="btn btn-sec" data-act="voltar" aria-label="Voltar">'+ico('voltar')+'</button><button class="btn btn-pri" data-act="continuar">Continuar '+ico('seta')+'</button>'; }
+  else if (p === 3) { html = htmlPasso3(); acoes = '<button class="btn btn-sec" data-act="voltar" aria-label="Voltar">'+ico('voltar')+'</button><button class="btn btn-pri" data-act="continuar" id="btn-cont3">Continuar '+ico('seta')+'</button>'; }
+  else if (p === 4) { html = htmlPasso4(); acoes = '<button class="btn btn-sec" data-act="voltar" aria-label="Voltar">'+ico('voltar')+'</button><button class="btn btn-pri" data-act="confirmar" id="btn-confirmar">'+ico('check')+' Confirmar agendamento</button>'; }
+  else if (p === 5) { html = htmlPasso5(); acoes = ''; }
+  else if (p === 'bravo') { html = htmlBravo(); acoes = ''; }
+  $tela.innerHTML = html;
+  setAcoes(acoes);
+  if (opts.manterScroll) $rol.scrollTop = scroll;
+  else { $rol.scrollTop = 0; if (opts.anim !== false) animar(opts.dir || 1); }
+  if (p === 1) refresh1();
+}
+
+/* ---------- Etapa 1 ---------- */
+function htmlPasso1(){
+  var p = W.pet;
+  return ''+
+  '<div class="faixa-oferta">'+ico('tag')+'<span><b>Ofertas da semana:</b> terça, 10% OFF em todos os produtos · quarta, 10% OFF em medicamentos <em>(retirada na loja)</em></span></div>'+
+  '<h1 class="tit">Vamos conhecer seu pet</h1>'+
+  '<p class="sub">Leva menos de 1 minuto. Os cuidados especiais de cada pet são aplicados automaticamente.</p>'+
+  '<div class="campo" id="c-nome"><label for="f-nome">Nome do pet</label><input id="f-nome" class="inp" maxlength="30" placeholder="Ex.: Thor" value="'+esc(p.nome)+'" autocomplete="off"><div class="msg-erro">Digite o nome do pet</div></div>'+
+  '<div class="campo" id="c-raca"><label for="f-raca">Raça</label><div class="busca">'+ico('busca')+
+    '<input id="f-raca" class="inp" placeholder="Digite para buscar (ex.: Pug)" value="'+esc(p.raca)+'" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="lista-racas">'+
+    '<div class="busca-lista" id="lista-racas" role="listbox" hidden></div></div><div class="msg-erro">Escolha a raça na lista (ou “SRD / Outra”)</div><div id="raca-info"></div></div>'+
+  '<div class="campo" id="c-idade"><label for="f-idade">Idade</label><div class="stepper">'+
+    '<button type="button" class="st-btn" data-act="idade-" aria-label="Diminuir idade">−</button>'+
+    '<div class="st-val"><input id="f-idade" type="number" inputmode="numeric" min="0" max="25" placeholder="—" value="'+(p.idade === '' ? '' : p.idade)+'"><span>anos</span></div>'+
+    '<button type="button" class="st-btn" data-act="idade+" aria-label="Aumentar idade">+</button></div>'+
+    '<div class="dica">Menos de 1 ano? Coloque 0.</div><div class="msg-erro">Informe a idade</div><div id="idade-info"></div></div>'+
+  '<div class="campo" id="c-porte"><span class="rot">Porte</span><div class="grade4">'+
+    ['P','M','G','GG'].map(function(k){ return '<button type="button" class="opc porte" data-act="porte" data-v="'+k+'"><b>'+k+'</b><small>'+PORTES[k]+'</small></button>'; }).join('')+
+    '</div><div class="msg-erro">Escolha o porte</div></div>'+
+  '<div class="campo" id="c-comp"><span class="rot">Comportamento no banho</span><div class="grade3">'+
+    Object.keys(COMP).map(function(k){ return '<button type="button" class="opc comp comp-'+k+'" data-act="comp" data-v="'+k+'">'+ico(COMP[k].ico,'grande')+'<b>'+COMP[k].nome+'</b><small>'+COMP[k].desc+'</small></button>'; }).join('')+
+    '</div><div class="msg-erro">Escolha o comportamento</div><div id="comp-info"></div></div>';
+}
+function refresh1(){
+  var p = W.pet, f = flagsDe(p);
+  document.querySelectorAll('.opc.porte').forEach(function(b){ b.classList.toggle('sel', b.dataset.v === p.porte); b.setAttribute('aria-pressed', b.dataset.v === p.porte); });
+  document.querySelectorAll('.opc.comp').forEach(function(b){ b.classList.toggle('sel', b.dataset.v === p.comp); b.setAttribute('aria-pressed', b.dataset.v === p.comp); });
+  var ri = document.getElementById('raca-info');
+  if (ri) ri.innerHTML = f.braqui
+    ? '<div class="aviso aviso-alerta">'+ico('vento')+'<p><b>Raça braquicefálica (focinho curto).</b> Vamos aplicar regras especiais de dia, horário e transporte para a segurança do pet.</p></div>'
+    : (p.raca === SRD ? '<div class="aviso aviso-info">'+ico('info')+'<p>Sem problema! Só escolha o porte abaixo.</p></div>' : '');
+  var ii = document.getElementById('idade-info');
+  if (ii) ii.innerHTML = f.idoso ? '<div class="aviso aviso-info">'+ico('info')+'<p><b>Pet idoso ('+cfg.idadeIdoso+'+ anos):</b> atendido em dias mais tranquilos ('+listaDiasCurto()+').</p></div>' : '';
+  var ci = document.getElementById('comp-info');
+  if (ci) ci.innerHTML = f.bravo
+    ? '<div class="aviso aviso-perigo">'+ico('escudo')+'<p><b>Pets bravos são atendidos pela clínica</b>, com acompanhamento veterinário.</p></div>'
+    : (f.agitado ? '<div class="aviso aviso-info">'+ico('info')+'<p><b>Pet agitado:</b> atendido com mais calma, de '+listaDiasCurto()+'.</p></div>' : '');
+}
+function renderListaRacas(q){
+  var lista = document.getElementById('lista-racas'), inp = document.getElementById('f-raca');
+  if (!lista) return;
+  var nq = norm(q);
+  var itens = todasRacas().filter(function(r){ return !nq || norm(r).indexOf(nq) >= 0; });
+  var html = itens.map(function(r){
+    var b = ehBraqui(r), ps = porteSugerido(r);
+    return '<button type="button" class="busca-item" role="option" data-act="raca" data-v="'+esc(r)+'">'+esc(r)+(b ? '<span class="tag tag-braqui">Braquicefálico</span>' : '')+(ps ? '<small>porte '+ps+'</small>' : '')+'</button>';
+  }).join('');
+  if (!itens.length) html = '<div class="busca-vazio">Não encontramos essa raça. Escolha a opção abaixo:</div>';
+  html += '<button type="button" class="busca-item" role="option" data-act="raca" data-v="'+SRD+'"><b>'+SRD+'</b><small>escolha o porte</small></button>';
+  lista.innerHTML = html;
+  lista.hidden = false;
+  if (inp) inp.setAttribute('aria-expanded','true');
+}
+function fecharListaRacas(){ var l = document.getElementById('lista-racas'); if (l) l.hidden = true; var i = document.getElementById('f-raca'); if (i) i.setAttribute('aria-expanded','false'); }
+
+function validar1(){
+  var p = W.pet, erros = [];
+  if (!p.nome.trim()) erros.push('c-nome');
+  if (!p.raca) erros.push('c-raca');
+  if (p.idade === '' || isNaN(+p.idade)) erros.push('c-idade');
+  if (!p.porte) erros.push('c-porte');
+  if (!p.comp) erros.push('c-comp');
+  return erros;
+}
+function marcarErros(ids){
+  document.querySelectorAll('.campo.erro').forEach(function(c){ c.classList.remove('erro'); });
+  ids.forEach(function(id){ var c = document.getElementById(id); if (c){ void c.offsetWidth; c.classList.add('erro'); } });
+  if (ids.length){ var c = document.getElementById(ids[0]); if (c) c.scrollIntoView({ behavior:'smooth', block:'center' }); }
+}
+
+/* ---------- Etapa 2 ---------- */
+function htmlPasso2(){
+  var porte = W.pet.porte || 'M';
+  return '<h1 class="tit">Qual serviço para '+esc(W.pet.nome)+'?</h1>'+
+    '<p class="sub">Duração estimada para porte <b>'+porte+'</b> ('+PORTE_NOME[porte]+'). Pode variar conforme a pelagem.</p>'+
+    '<div id="c-serv" class="campo">'+
+    Object.keys(SERVICOS).map(function(k){
+      var s = SERVICOS[k];
+      return '<button type="button" class="servico'+(W.servico === k ? ' sel' : '')+'" data-act="servico" data-v="'+k+'">'+
+        '<span class="s-ico">'+ico(s.ico,'grande')+'</span><span class="s-txt"><b>'+s.nome+'</b><small>'+s.desc+'</small>'+
+        '<span class="dur">'+ico('relogio')+'~'+fmtDur(s.dur[porte])+'</span></span><span class="radio">'+ico('check')+'</span></button>';
+    }).join('')+'<div class="msg-erro">Escolha um serviço</div></div>';
+}
+
+/* ---------- Etapa 3 ---------- */
+function htmlRegras(f){
+  var nome = esc(W.pet.nome || 'seu pet');
+  if (!sensivel(f)) return '<div class="regras livre"><div class="regras-tit">'+ico('check')+' Nenhuma restrição para '+nome+': todos os dias de expediente estão liberados.</div></div>';
+  var li = [];
+  if (f.braqui) {
+    li.push('<li>'+ico('cal')+'<span>Braquicefálico: somente '+listaDias()+'</span></li>');
+    li.push(cfg.verao
+      ? '<li>'+ico('sol')+'<span>Modo verão: sem horários quentes ('+cfg.quenteIni+'h às '+cfg.quenteFim+'h)</span></li>'
+      : '<li>'+ico('sol')+'<span>Modo verão desligado: horários da tarde liberados</span></li>');
+    li.push('<li>'+ico('carro')+'<span>Deve vir de carro com ar-condicionado</span></li>');
+  }
+  if (f.idoso) li.push('<li>'+ico('cal')+'<span>Pet idoso ('+idadeTxt(W.pet.idade)+'): somente '+listaDias()+'</span></li>');
+  if (f.agitado) li.push('<li>'+ico('cal')+'<span>Pet agitado: somente '+listaDias()+'</span></li>');
+  return '<div class="regras"><div class="regras-tit">'+ico('escudo')+' Regras aplicadas para '+nome+' '+tagsHTML(f)+'</div><ul>'+li.join('')+'</ul></div>';
+}
+function tagsHTML(f){
+  var t = [];
+  if (f.braqui) t.push('<span class="tag tag-braqui">Braquicefálico</span>');
+  if (f.idoso) t.push('<span class="tag tag-idoso">Idoso</span>');
+  if (f.agitado) t.push('<span class="tag tag-agitado">Agitado</span>');
+  return t.length ? '<span class="tags">'+t.join('')+'</span>' : '';
+}
+function htmlPasso3(){
+  var f = flagsDe(W.pet);
+  var dias = proximosDias(14), hojeS = ymd(new Date());
+  if (W.data && !estadoDia(W.data, f).ok) { W.data = ''; W.hora = null; }
+  if (W.data && W.hora != null && estadoHorario(W.data, W.hora, f).s !== 'livre') W.hora = null;
+  var cal = dias.map(function(d){
+    var s = ymd(d), e = estadoDia(s, f), dow = d.getDay();
+    var cls = 'dia '+(e.ok ? 'on' : 'off')+(W.data === s ? ' sel' : '')+(s === hojeS ? ' hoje' : '');
+    return '<button type="button" class="'+cls+'" data-act="dia" data-v="'+s+'" data-ok="'+(e.ok?1:0)+'" data-dow="'+dow+'" data-motivo="'+esc(e.motivo||'')+'" aria-disabled="'+(!e.ok)+'" aria-label="'+esc(dataLonga(s)+(e.ok ? '' : ' — indisponível: '+e.motivo))+'">'+
+      '<small>'+DIAS_CURTO[dow]+'</small><b>'+d.getDate()+'</b>'+(e.ok ? '<i></i>' : ico('cadeado'))+'</button>';
+  }).join('');
+  var ini = dias[0], fim = dias[13];
+  var mes = pad(ini.getDate())+'/'+pad(ini.getMonth()+1)+' a '+pad(fim.getDate())+'/'+pad(fim.getMonth()+1);
+  var horasHTML = '';
+  if (W.data) {
+    var hs = horasDoDia(W.data);
+    horasHTML = '<div class="secao-tit" id="titulo-horas">'+ico('relogio')+' Horários de '+dataCurta(W.data)+'<small>'+(parse(W.data).getDay() === 6 ? 'sábado: 9h às 17h' : '9h às 19h')+'</small></div>'+
+      '<div class="horas-wrap"><div class="horas" id="horas">'+hs.map(function(h){
+        var e = estadoHorario(W.data, h, f);
+        var sub = e.s === 'livre' ? (e.livres === 1 ? '1 vaga' : e.livres+' vagas') : e.s === 'esgotado' ? 'esgotado' : e.s === 'calor' ? ico('sol','mini')+'calor' : 'passou';
+        return '<button type="button" class="hora h-'+e.s+(W.hora === h ? ' sel' : '')+'" data-act="hora" data-v="'+h+'" data-estado="'+e.s+'" data-motivo="'+esc(e.motivo||'')+'" aria-disabled="'+(e.s !== 'livre')+'"><b>'+hh(h)+'</b><small>'+sub+'</small></button>';
+      }).join('')+'</div></div>'+
+      '<div class="legenda"><span><i></i>Livre</span><span><i class="l-esg"></i>Esgotado</span>'+(f.braqui && cfg.verao ? '<span><i class="l-calor"></i>Bloqueado (calor)</span>' : '')+'</div>';
+  } else {
+    horasHTML = '<div class="secao-tit">'+ico('relogio')+' Horários</div><div class="vazio-horas">Toque em um dia liberado para ver os horários.</div>';
+  }
+  return '<h1 class="tit">Escolha o dia e o horário</h1>'+
+    '<p class="sub">Só aparecem liberados os dias e horários seguros para '+esc(W.pet.nome)+'. Toque num dia bloqueado para ver o motivo.</p>'+
+    htmlRegras(f)+
+    '<div class="secao-tit">'+ico('cal')+' Próximas 2 semanas<small>'+mes+'</small></div>'+
+    '<div class="cal-wrap"><div class="cal" id="cal">'+cal+'</div></div>'+
+    '<div class="legenda"><span><i></i>Disponível</span><span><i class="l-off"></i>Bloqueado</span></div>'+
+    horasHTML;
+}
+
+/* ---------- Etapa 4 ---------- */
+function htmlPasso4(){
+  var f = flagsDe(W.pet), s = SERVICOS[W.servico];
+  var avisoBraqui = f.braqui ?
+    '<div class="campo" id="c-carro"><div class="aviso aviso-alerta" style="margin-top:0">'+ico('carro')+'<div><p><b>Transporte: somente de carro com ar-condicionado.</b> '+esc(W.pet.nome)+' não pode vir caminhando, mesmo morando perto. O Taxi Dog não transporta braquicefálicos.</p>'+
+      '<details class="porque"><summary>'+ico('info','mini')+' Por quê?</summary><p>Raças de focinho curto têm mais risco de dificuldade respiratória e colapso de traqueia no calor.</p></details></div></div>'+
+      '<label class="caixa-check"><input type="checkbox" id="f-carro"'+(W.carro ? ' checked' : '')+'><span>Confirmo que o pet virá de carro com ar-condicionado</span></label>'+
+      '<div class="msg-erro">Para braquicefálicos, essa confirmação é obrigatória</div></div>' : '';
+  return '<h1 class="tit">Quase lá! Seus dados</h1>'+
+    '<p class="sub">Para enviarmos a confirmação e falarmos com você se precisar.</p>'+
+    '<div class="mini-resumo">'+ico('cal')+'<span>'+esc(W.pet.nome)+' · '+s.nome+' · '+dataCurta(W.data)+' às '+hh(W.hora)+'</span></div>'+
+    '<div class="campo" id="c-tutor"><label for="f-tutor">Seu nome</label><input id="f-tutor" class="inp" maxlength="40" placeholder="Nome do tutor" value="'+esc(W.tutor)+'" autocomplete="name"><div class="msg-erro">Digite seu nome</div></div>'+
+    '<div class="campo" id="c-tel"><label for="f-tel">WhatsApp</label><input id="f-tel" class="inp" type="tel" inputmode="numeric" placeholder="(41) 99999-9999" value="'+esc(W.tel)+'" autocomplete="tel"><div class="msg-erro">Digite um WhatsApp válido com DDD</div></div>'+
+    avisoBraqui;
+}
+function validar4(){
+  var e = [];
+  if (!W.tutor.trim()) e.push('c-tutor');
+  if (W.tel.replace(/\D/g,'').length < 10) e.push('c-tel');
+  if (flagsDe(W.pet).braqui && !W.carro) e.push('c-carro');
+  return e;
+}
+
+/* ---------- Etapa 5 ---------- */
+function msgComprovante(a){
+  var f = flagsDe(a), L = [];
+  L.push('*Comprovante de agendamento — Mundo Pet Banho e Tosa*');
+  L.push('');
+  L.push('Pet: '+a.pet);
+  L.push('Raça: '+a.raca+(f.braqui ? ' (braquicefálico)' : ''));
+  L.push('Idade: '+idadeTxt(a.idade));
+  L.push('Porte: '+a.porte);
+  L.push('Comportamento: '+COMP[a.comp].nome);
+  L.push('Serviço: '+SERVICOS[a.servico].nome);
+  L.push('Data: '+dataLonga(a.data));
+  L.push('Horário: '+hh(a.hora));
+  L.push('Tutor: '+a.tutor+(a.tel ? ' · '+a.tel : ''));
+  var al = alertasDe(a);
+  if (al.length){ L.push(''); L.push('Alertas:'); al.forEach(function(x){ L.push('- '+x); }); }
+  L.push('');
+  L.push('Agendado pelo link (confirmação automática).');
+  return L.join('\n');
+}
+function htmlPasso5(){
+  var a = W.ultimo; if (!a) return '';
+  var f = flagsDe(a), al = alertasDe(a);
+  return '<div class="centro"><div class="check-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>'+
+    '<h1 class="tit" id="titulo-ok">Agendamento confirmado — não precisa esperar resposta</h1>'+
+    '<p class="sub">O horário de '+esc(a.pet)+' já está reservado na agenda do Mundo Pet.</p></div>'+
+    '<div class="resumo">'+
+      '<div class="resumo-linha">'+ico('pata')+'<div><small>Pet</small><b>'+esc(a.pet)+'</b> · '+esc(a.raca)+' · '+idadeTxt(a.idade)+' · porte '+a.porte+' · '+COMP[a.comp].nome.toLowerCase()+(sensivel(f) ? '<div style="margin-top:6px">'+tagsHTML(f)+'</div>' : '')+'</div></div>'+
+      '<div class="resumo-linha">'+ico(SERVICOS[a.servico].ico)+'<div><small>Serviço</small><b>'+SERVICOS[a.servico].nome+'</b> · ~'+fmtDur(SERVICOS[a.servico].dur[a.porte])+'</div></div>'+
+      '<div class="resumo-linha">'+ico('cal')+'<div><small>Data e horário</small><b>'+cap(dataLonga(a.data))+'</b> às <b>'+hh(a.hora)+'</b></div></div>'+
+      '<div class="resumo-linha">'+ico('usuario')+'<div><small>Tutor</small><b>'+esc(a.tutor)+'</b> · '+esc(a.tel)+'</div></div>'+
+    '</div>'+
+    (al.length ? al.map(function(x, i){ return '<div class="aviso '+(i === 0 && f.braqui ? 'aviso-alerta' : 'aviso-info')+'">'+ico(i === 0 && f.braqui ? 'carro' : 'info')+'<p>'+esc(x)+'</p></div>'; }).join('') : '')+
+    '<div class="pilha">'+
+      '<a class="btn btn-sec btn-cheio" id="btn-comprovante" href="'+esc(waLink(WA_BANHO, msgComprovante(a)))+'" target="_blank" rel="noopener">'+ico('chat')+' Receber comprovante no WhatsApp</a>'+
+      '<button class="btn btn-fant btn-cheio" data-act="novo">'+ico('mais')+' Fazer outro agendamento</button>'+
+    '</div>'+
+    '<div class="faixa-oferta" style="margin:14px 0 0">'+ico('tag')+'<span><b>Aproveite:</b> terça, 10% OFF em todos os produtos · quarta, 10% OFF em medicamentos <em>(retirada na loja)</em></span></div>';
+}
+
+/* ---------- Pet bravo ---------- */
+function msgClinica(){
+  var p = W.pet;
+  return 'Olá! Gostaria de agendar uma tosa com acompanhamento veterinário.\n\n'+
+    'Pet: '+p.nome+'\nRaça: '+p.raca+'\nIdade: '+idadeTxt(p.idade)+'\nPorte: '+p.porte+'\nComportamento: bravo/agressivo\n\n'+
+    '(Encaminhado pelo agendamento online do banho e tosa)';
+}
+function htmlBravo(){
+  return '<div class="centro"><div class="icone-grande" style="background:var(--perigo-claro);color:var(--perigo)">'+ico('escudo')+'</div>'+
+    '<h1 class="tit" id="titulo-bravo">'+esc(W.pet.nome)+' precisa de um cuidado especial</h1></div>'+
+    '<div class="resumo" style="padding:14px 16px;font-weight:700;color:var(--suave)">'+
+      '<p style="margin:0 0 10px">Para pets <b style="color:var(--tinta)">bravos ou agressivos</b>, a tosa é feita com <b style="color:var(--tinta)">acompanhamento veterinário e sedação</b>, para a segurança do pet e da equipe.</p>'+
+      '<p style="margin:0">Por isso, esse agendamento é feito diretamente com a nossa clínica veterinária. A mensagem já vai pronta com os dados de '+esc(W.pet.nome)+'.</p>'+
+    '</div>'+
+    '<div class="pilha">'+
+      '<a class="btn btn-wa btn-cheio" id="btn-clinica" href="'+esc(waLink(WA_CLINICA, msgClinica()))+'" target="_blank" rel="noopener">'+ico('clinica')+' Falar com a clínica no WhatsApp</a>'+
+      '<div class="centro dica">Clínica veterinária: (41) 99575-2003</div>'+
+      '<button class="btn btn-fant btn-cheio" data-act="voltar-bravo">'+ico('voltar')+' Voltar e revisar os dados</button>'+
+    '</div>';
+}
+
+/* ---------- Navegação do wizard ---------- */
+function continuar(){
+  if (W.passo === 1) {
+    var e = validar1();
+    if (e.length){ marcarErros(e); toast('Falta preencher alguns dados do pet'); return; }
+    fecharListaRacas();
+    W.passo = W.pet.comp === 'bravo' ? 'bravo' : 2;
+  } else if (W.passo === 2) {
+    if (!W.servico){ marcarErros(['c-serv']); toast('Escolha um serviço'); return; }
+    W.passo = 3;
+  } else if (W.passo === 3) {
+    if (!W.data || W.hora == null){ toast(W.data ? 'Escolha um horário' : 'Escolha um dia e um horário'); var hz = document.getElementById(W.data ? 'titulo-horas' : 'cal'); if (hz) hz.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    W.passo = 4;
+  }
+  renderWizard({ dir:1 });
+}
+function voltar(){
+  if (W.passo === 2 || W.passo === 'bravo') W.passo = 1;
+  else if (W.passo === 3) W.passo = 2;
+  else if (W.passo === 4) W.passo = 3;
+  renderWizard({ dir:-1 });
+}
+function confirmar(){
+  var e = validar4();
+  if (e.length){ marcarErros(e); toast(e.indexOf('c-carro') >= 0 && e.length === 1 ? 'Confirme o transporte de carro com ar-condicionado' : 'Confira seus dados'); return; }
+  recarregarDados();
+  var f = flagsDe(W.pet);
+  if (!estadoDia(W.data, f).ok || estadoHorario(W.data, W.hora, f).s !== 'livre') {
+    toast('Esse horário acabou de ser reservado. Escolha outro, por favor.');
+    W.hora = null; W.passo = 3; renderWizard({ dir:-1 }); return;
+  }
+  var a = {
+    id:'ag'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    pet:W.pet.nome.trim(), raca:W.pet.raca, idade:+W.pet.idade, porte:W.pet.porte, comp:W.pet.comp,
+    servico:W.servico, data:W.data, hora:W.hora, tutor:W.tutor.trim(), tel:W.tel,
+    origem:'online', status:'agendado', criado:Date.now(), carroConfirmado: f.braqui ? true : undefined
+  };
+  ags.push(a); salvarAgs();
+  if (P.conhecidos) P.conhecidos[a.id] = true;
+  W.ultimo = a; W.passo = 5;
+  renderWizard({ dir:1 });
+}
+
+/* ============================================================
+   PAINEL DA EQUIPE
+   ============================================================ */
+var P = { aba:'agenda', modo:'semana', dia:ymd(new Date()), conhecidos:null, novoId:null };
+function marcarConhecidos(){ P.conhecidos = {}; ags.forEach(function(a){ P.conhecidos[a.id] = true; }); }
+
+function renderPainel(opts){
+  opts = opts || {};
+  limparWa();
+  if (!P.conhecidos) marcarConhecidos();
+  document.body.classList.add('largo');
+  $rol.classList.remove('wa-bg');
+  $tela.style.padding = '';
+  $topo.className = 'topo';
+  $topo.innerHTML = '<button class="topo-voltar" data-act="sair-painel" aria-label="Voltar ao agendamento">'+ico('voltar')+'</button>'+
+    '<div class="marca"><div><span>Área da equipe</span><small>Mundo Pet — Banho e Tosa</small></div></div>'+
+    '<span class="ao-vivo"><i></i>Ao vivo</span>';
+  $prog.className = 'abas';
+  $prog.innerHTML = '<button class="aba'+(P.aba === 'agenda' ? ' sel' : '')+'" data-act="painel-aba" data-v="agenda">'+ico('lista')+' Agenda</button>'+
+    '<button class="aba'+(P.aba === 'regras' ? ' sel' : '')+'" data-act="painel-aba" data-v="regras" id="aba-regras">'+ico('ajustes')+' Regras</button>';
+  var scroll = $rol.scrollTop;
+  $tela.innerHTML = P.aba === 'agenda' ? htmlAgenda() : htmlRegrasCfg();
+  setAcoes('');
+  if (opts.manterScroll) $rol.scrollTop = scroll; else { $rol.scrollTop = 0; if (opts.anim !== false) animar(1); }
+  if (P.novoId) {
+    var el = document.querySelector('.ag[data-id="'+P.novoId+'"]');
+    if (el) setTimeout(function(){ el.scrollIntoView({ behavior:'smooth', block:'center' }); }, 60);
+    P.novoId = null;
+  }
+}
+
+function htmlCard(a){
+  var f = flagsDe(a), s = SERVICOS[a.servico] || SERVICOS.banho;
+  var acoes = a.status === 'agendado'
+    ? '<button class="b-ok" data-act="concluir" data-id="'+a.id+'">'+ico('check')+'Concluir</button><button class="b-x" data-act="cancelar" data-id="'+a.id+'">'+ico('x')+'Cancelar</button>'
+    : '<span class="status-pill '+a.status+'">'+(a.status === 'concluido' ? 'Concluído' : 'Cancelado')+'</span><button data-act="reabrir" data-id="'+a.id+'">'+ico('desfazer')+'Desfazer</button>';
+  return '<article class="ag '+a.status+(P.destacar && P.destacar[a.id] ? ' novo' : '')+'" data-id="'+a.id+'">'+
+    '<div class="ag-top"><b>'+esc(a.pet)+'</b><span class="ag-raca">'+esc(a.raca)+'</span><span class="origem '+a.origem+'">'+(a.origem === 'balcao' ? 'Balcão' : 'Online')+'</span></div>'+
+    '<div class="ag-meta">'+s.nome+' · porte '+esc(a.porte)+' · '+idadeTxt(a.idade)+' · tutor: '+esc(a.tutor)+(a.tel ? ' · '+esc(a.tel) : '')+'</div>'+
+    tagsHTML(f)+
+    '<div class="ag-acoes">'+acoes+'</div></article>';
+}
+function htmlBlocoDia(data){
+  var dow = parse(data).getDay();
+  var lista = ags.filter(function(a){ return a.data === data; }).sort(function(a,b){ return a.hora - b.hora || (a.criado||0) - (b.criado||0); });
+  var ativos = lista.filter(function(a){ return a.status !== 'cancelado'; }).length;
+  var cab = '<h3>'+ico('cal')+cap(dataLonga(data))+'<small>'+(horario(dow) ? ativos+' agendamento'+(ativos === 1 ? '' : 's') : 'fechado')+'</small></h3>';
+  if (!horario(dow)) return '<div class="bloco-dia">'+cab+'<div class="vazio">Fechado aos domingos</div></div>';
+  if (!lista.length) return '<div class="bloco-dia">'+cab+'<div class="vazio">Nenhum agendamento</div></div>';
+  var horas = [];
+  lista.forEach(function(a){ if (horas.indexOf(a.hora) < 0) horas.push(a.hora); });
+  return '<div class="bloco-dia" data-dia="'+data+'">'+cab+horas.map(function(h){
+    var oc = ocupacao(data, h), cheio = oc >= cfg.vagas;
+    return '<div class="slot-linha"><div class="slot-h">'+hh(h)+'<small class="'+(cheio ? 'cheio' : '')+'">'+oc+'/'+cfg.vagas+(cheio ? ' · cheio' : '')+'</small></div><div class="slot-cards">'+
+      lista.filter(function(a){ return a.hora === h; }).map(htmlCard).join('')+'</div></div>';
+  }).join('')+'</div>';
+}
+function htmlAgenda(){
+  var hojeS = ymd(new Date());
+  var deHoje = ags.filter(function(a){ return a.data === hojeS && a.status !== 'cancelado'; });
+  var concl = deHoje.filter(function(a){ return a.status === 'concluido'; }).length;
+  var proximos = ags.filter(function(a){ return a.data >= hojeS && a.status === 'agendado'; }).length;
+  var dias = proximosDias(14);
+  var corpo;
+  if (P.modo === 'dia') {
+    corpo = '<div class="chips-dias">'+dias.map(function(d){
+      var s = ymd(d), n = ags.filter(function(a){ return a.data === s && a.status !== 'cancelado'; }).length;
+      return '<button class="chip-dia'+(P.dia === s ? ' sel' : '')+(horario(d.getDay()) ? '' : ' fechado')+'" data-act="painel-dia" data-v="'+s+'"><small>'+DIAS_CURTO[d.getDay()]+'</small><b>'+d.getDate()+'</b><em>'+(horario(d.getDay()) ? n : '—')+'</em></button>';
+    }).join('')+'</div>'+htmlBlocoDia(P.dia);
+  } else {
+    corpo = '<div class="grade-semana">'+dias.slice(0,7).map(function(d){ return htmlBlocoDia(ymd(d)); }).join('')+'</div>';
+  }
+  return '<div class="resumo-dia">'+
+      '<div class="kpi"><b>'+deHoje.length+'</b><small>hoje</small></div>'+
+      '<div class="kpi"><b>'+concl+'</b><small>concluídos hoje</small></div>'+
+      '<div class="kpi"><b>'+proximos+'</b><small>a atender (14 dias)</small></div>'+
+    '</div>'+
+    '<div class="barra-ferr"><div class="seg"><button class="'+(P.modo === 'dia' ? 'sel' : '')+'" data-act="painel-modo" data-v="dia">Dia</button><button class="'+(P.modo === 'semana' ? 'sel' : '')+'" data-act="painel-modo" data-v="semana">Semana</button></div>'+
+    '<button class="btn btn-pri btn-peq" data-act="balcao" id="btn-balcao">'+ico('mais')+' Agendamento do balcão</button></div>'+
+    corpo+
+    '<div class="centro" style="margin-top:8px"><button class="btn btn-fant btn-peq" data-act="restaurar">'+ico('refresh')+' Restaurar dados de exemplo</button></div>';
+}
+
+function opcoesHora(sel){ var o = ''; for (var h=9; h<=19; h++) o += '<option value="'+h+'"'+(h === sel ? ' selected' : '')+'>'+h+'h</option>'; return o; }
+function htmlRegrasCfg(){
+  var diasTog = [1,2,3,4,5,6].map(function(d){ return '<button class="'+(cfg.diasSensiveis.indexOf(d) >= 0 ? 'sel' : '')+'" data-act="cfg-dia" data-v="'+d+'" aria-pressed="'+(cfg.diasSensiveis.indexOf(d) >= 0)+'">'+DIAS_CURTO[d]+'</button>'; }).join('');
+  var chips = cfg.braqui.map(function(b){ return '<span class="raca-chip">'+esc(b)+'<button data-act="cfg-raca-rem" data-v="'+esc(b)+'" aria-label="Remover '+esc(b)+'">'+ico('x')+'</button></span>'; }).join('');
+  return '<h1 class="tit" style="font-size:20px">Regras do agendamento</h1>'+
+    '<p class="sub">Tudo aqui é configurável e vale na hora para a agenda online e para o balcão.</p>'+
+    '<div class="cfg-card"><div class="cfg-linha"><span style="color:var(--alerta)">'+ico('sol','grande')+'</span><div class="txt"><b>Modo verão</b><small>Bloqueia horários quentes para braquicefálicos</small></div>'+
+      '<label class="switch"><input type="checkbox" id="cfg-verao"'+(cfg.verao ? ' checked' : '')+' aria-label="Modo verão"><span></span></label></div>'+
+      '<div class="faixa-hora">Bloquear das <select class="sel-inp" id="cfg-ini">'+opcoesHora(cfg.quenteIni)+'</select> às <select class="sel-inp" id="cfg-fim">'+opcoesHora(cfg.quenteFim)+'</select></div></div>'+
+    '<div class="cfg-card"><div class="cfg-linha"><div class="txt"><b>Pet idoso a partir de</b><small>Idosos só nos dias permitidos abaixo</small></div><input class="num-inp" type="number" min="1" max="25" id="cfg-idoso" value="'+cfg.idadeIdoso+'" aria-label="Idade mínima para idoso"><span style="font-weight:800">anos</span></div></div>'+
+    '<div class="cfg-card"><div class="cfg-linha"><div class="txt"><b>Vagas por horário</b><small>Quantos pets a equipe atende ao mesmo tempo</small></div><input class="num-inp" type="number" min="1" max="10" id="cfg-vagas" value="'+cfg.vagas+'" aria-label="Vagas por horário"></div></div>'+
+    '<div class="cfg-card"><b style="font-weight:900">Dias permitidos para pets sensíveis</b><div class="dica" style="margin-top:2px">Braquicefálicos, idosos e agitados</div><div class="dias-toggle">'+diasTog+'</div></div>'+
+    '<div class="cfg-card"><b style="font-weight:900">Raças braquicefálicas</b><div class="dica" style="margin-top:2px">Marcadas automaticamente na busca de raça</div><div class="racas-chips">'+chips+'</div>'+
+      '<div class="add-raca"><input class="inp" id="cfg-nova-raca" placeholder="Adicionar raça" list="dl-racas"><datalist id="dl-racas">'+RACAS_BASE.map(function(r){ return '<option value="'+esc(r[0])+'">'; }).join('')+'</datalist><button class="btn btn-pri btn-peq" data-act="cfg-raca-add">'+ico('mais')+'</button></div></div>'+
+    '<div class="centro"><button class="btn btn-fant btn-peq" data-act="restaurar">'+ico('refresh')+' Restaurar dados de exemplo</button></div>';
+}
+function cfgMudou(msg){ salvarCfg(); toast(msg || 'Regra salva — já vale para a agenda online', 'ok', 2200); }
+
+/* ---------- Balcão ---------- */
+function abrirBalcao(){
+  var racas = todasRacas().concat([SRD]);
+  var m = document.createElement('div');
+  m.className = 'modal-fundo'; m.id = 'modal';
+  m.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-tit">'+
+    '<div class="modal-topo"><h2 id="m-tit">Agendamento do balcão</h2><button data-act="fechar-modal" aria-label="Fechar">'+ico('x')+'</button></div>'+
+    '<p class="dica" style="margin:-6px 0 12px">Mesma agenda e mesmas regras da agenda online.</p>'+
+    '<div class="grade2"><div class="campo"><label for="b-nome">Pet</label><input class="inp" id="b-nome" placeholder="Nome"></div>'+
+    '<div class="campo"><label for="b-raca">Raça</label><select class="inp" id="b-raca">'+racas.map(function(r){ return '<option>'+esc(r)+'</option>'; }).join('')+'</select></div></div>'+
+    '<div class="grade2"><div class="campo"><label for="b-idade">Idade</label><input class="inp" id="b-idade" type="number" min="0" max="25" value="3"></div>'+
+    '<div class="campo"><label for="b-porte">Porte</label><select class="inp" id="b-porte"><option>P</option><option selected>M</option><option>G</option><option>GG</option></select></div></div>'+
+    '<div class="grade2"><div class="campo"><label for="b-comp">Comportamento</label><select class="inp" id="b-comp"><option value="calmo">Calmo</option><option value="agitado">Agitado</option><option value="bravo">Bravo</option></select></div>'+
+    '<div class="campo"><label for="b-serv">Serviço</label><select class="inp" id="b-serv">'+Object.keys(SERVICOS).map(function(k){ return '<option value="'+k+'">'+SERVICOS[k].nome+'</option>'; }).join('')+'</select></div></div>'+
+    '<div id="b-info"></div>'+
+    '<div class="grade2"><div class="campo"><label for="b-data">Dia</label><select class="inp" id="b-data"></select></div>'+
+    '<div class="campo"><label for="b-hora">Horário</label><select class="inp" id="b-hora"></select></div></div>'+
+    '<div class="grade2"><div class="campo"><label for="b-tutor">Tutor</label><input class="inp" id="b-tutor" placeholder="Nome"></div>'+
+    '<div class="campo"><label for="b-tel">WhatsApp</label><input class="inp" id="b-tel" type="tel" inputmode="numeric" placeholder="(41) 9…"></div></div>'+
+    '<button class="btn btn-pri btn-cheio" data-act="salvar-balcao" id="b-salvar">'+ico('check')+' Salvar na agenda</button></div>';
+  $camada.appendChild(m);
+  var r = document.getElementById('b-raca'); r.value = 'Poodle';
+  document.getElementById('b-porte').value = porteSugerido('Poodle') || 'M';
+  atualizarBalcao();
+  setTimeout(function(){ var n = document.getElementById('b-nome'); if (n) n.focus(); }, 250);
+}
+function petBalcao(){
+  return { raca:document.getElementById('b-raca').value, idade:document.getElementById('b-idade').value, comp:document.getElementById('b-comp').value };
+}
+function atualizarBalcao(){
+  var p = petBalcao(), f = flagsDe(p);
+  var info = document.getElementById('b-info'), sd = document.getElementById('b-data'), sh = document.getElementById('b-hora'), bt = document.getElementById('b-salvar');
+  if (f.bravo) {
+    info.innerHTML = '<div class="aviso aviso-perigo" style="margin:0 0 12px">'+ico('escudo')+'<p><b>Pet bravo:</b> encaminhar para a clínica (tosa com acompanhamento veterinário e sedação).</p></div>';
+    sd.innerHTML = ''; sh.innerHTML = ''; sd.disabled = sh.disabled = bt.disabled = true; bt.style.opacity = .5; return;
+  }
+  sd.disabled = sh.disabled = bt.disabled = false; bt.style.opacity = '';
+  info.innerHTML = sensivel(f) ? '<div class="aviso aviso-alerta" style="margin:0 0 12px">'+ico('escudo')+'<div><p style="margin-bottom:4px">'+tagsHTML(f)+'</p><p>Regras aplicadas: só '+listaDiasCurto()+(f.braqui && cfg.verao ? ', fora das '+cfg.quenteIni+'h–'+cfg.quenteFim+'h' : '')+'.</p></div></div>' : '';
+  var atual = sd.value;
+  var dias = proximosDias(14).map(function(d){ var s = ymd(d); return { s:s, e:estadoDia(s, f) }; });
+  sd.innerHTML = dias.map(function(x){ return '<option value="'+x.s+'"'+(x.e.ok ? '' : ' disabled')+'>'+dataCurta(x.s)+(x.e.ok ? '' : ' — bloqueado')+'</option>'; }).join('');
+  var okAtual = dias.some(function(x){ return x.s === atual && x.e.ok; });
+  var primeiro = dias.find(function(x){ return x.e.ok; });
+  sd.value = okAtual ? atual : (primeiro ? primeiro.s : '');
+  atualizarHorasBalcao();
+}
+function atualizarHorasBalcao(){
+  var f = flagsDe(petBalcao()), sd = document.getElementById('b-data'), sh = document.getElementById('b-hora');
+  if (!sd.value){ sh.innerHTML = ''; return; }
+  var atual = sh.value;
+  var hs = horasDoDia(sd.value).map(function(h){ return { h:h, e:estadoHorario(sd.value, h, f) }; });
+  sh.innerHTML = hs.map(function(x){
+    var lab = x.e.s === 'livre' ? (x.e.livres === 1 ? '1 vaga' : x.e.livres+' vagas') : x.e.s === 'calor' ? 'calor' : x.e.s;
+    return '<option value="'+x.h+'"'+(x.e.s === 'livre' ? '' : ' disabled')+'>'+hh(x.h)+' — '+lab+'</option>';
+  }).join('');
+  var ok = hs.some(function(x){ return String(x.h) === atual && x.e.s === 'livre'; });
+  var pr = hs.find(function(x){ return x.e.s === 'livre'; });
+  sh.value = ok ? atual : (pr ? String(pr.h) : '');
+}
+function salvarBalcao(){
+  var nome = document.getElementById('b-nome').value.trim(), tutor = document.getElementById('b-tutor').value.trim();
+  var p = petBalcao(), data = document.getElementById('b-data').value, hora = +document.getElementById('b-hora').value;
+  if (!nome || !tutor){ toast('Preencha o nome do pet e do tutor'); return; }
+  if (!data || isNaN(hora) || document.getElementById('b-hora').value === ''){ toast('Escolha um dia e horário disponíveis'); return; }
+  recarregarDados();
+  if (estadoHorario(data, hora, flagsDe(p)).s !== 'livre'){ toast('Esse horário acabou de lotar'); atualizarBalcao(); return; }
+  var a = { id:'bc'+Date.now().toString(36), pet:nome, raca:p.raca, idade:+p.idade || 0, porte:document.getElementById('b-porte').value, comp:p.comp,
+    servico:document.getElementById('b-serv').value, data:data, hora:hora, tutor:tutor, tel:document.getElementById('b-tel').value,
+    origem:'balcao', status:'agendado', criado:Date.now() };
+  ags.push(a); salvarAgs(); P.conhecidos[a.id] = true;
+  fecharModal();
+  P.destacar = {}; P.destacar[a.id] = true; P.novoId = a.id;
+  if (P.modo === 'dia') P.dia = data;
+  else if (proximosDias(7).map(ymd).indexOf(data) < 0){ P.modo = 'dia'; P.dia = data; }
+  renderPainel({ anim:false });
+  toast('Salvo! A vaga já sumiu da agenda online.', 'ok');
+}
+function fecharModal(){ var m = document.getElementById('modal'); if (m) m.remove(); }
+
+/* ============================================================
+   SINCRONIZAÇÃO ENTRE ABAS (storage + polling leve)
+   ============================================================ */
+function recarregarDados(){
+  var c = lerJSON(K_CFG), a = lerJSON(K_AGS);
+  if (c) cfg = normalizarCfg(c);
+  if (Array.isArray(a)) ags = a;
+  ultCfg = store.get(K_CFG); ultAgs = store.get(K_AGS);
+}
+function aoMudarExterno(){
+  recarregarDados();
+  var rota = location.hash;
+  if (rota === '#painel') {
+    if (document.getElementById('modal')) { atualizarBalcao(); return; }
+    var novos = ags.filter(function(a){ return P.conhecidos && !P.conhecidos[a.id]; });
+    if (novos.length) {
+      P.destacar = {};
+      novos.forEach(function(a){ P.conhecidos[a.id] = true; P.destacar[a.id] = true; });
+      var n = novos[novos.length-1];
+      P.novoId = n.id; P.aba = 'agenda';
+      if (P.modo === 'dia') P.dia = n.data;
+      else if (proximosDias(7).map(ymd).indexOf(n.data) < 0){ P.modo = 'dia'; P.dia = n.data; }
+      renderPainel({ anim:false, manterScroll:true });
+      toast('<b>Novo agendamento online:</b> '+esc(n.pet)+' ('+esc(n.raca)+') — '+dataCurta(n.data)+' às '+hh(n.hora), 'novo', 4500);
+    } else {
+      renderPainel({ anim:false, manterScroll:true });
+    }
+  } else if (rota === '#agendar' && W.passo === 3) {
+    renderWizard({ anim:false, manterScroll:true });
+  }
+}
+window.addEventListener('storage', function(e){ if (e.key === K_AGS || e.key === K_CFG || e.key === null) aoMudarExterno(); });
+setInterval(function(){
+  var a = store.get(K_AGS), c = store.get(K_CFG);
+  if (a !== ultAgs || c !== ultCfg) aoMudarExterno();
+}, 1500);
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+$phone.addEventListener('click', function(e){
+  if (!e.target.closest('.busca')) fecharListaRacas();
+  var t = e.target.closest('[data-act]'); if (!t) return;
+  var act = t.dataset.act, v = t.dataset.v;
+  switch (act) {
+    case 'ir-agendar': e.preventDefault(); novoWizard(); location.hash = '#agendar'; break;
+    case 'wa-repetir': tocarWa(); break;
+    case 'equipe': location.hash = '#painel'; break;
+    case 'sair-painel': location.hash = '#agendar'; break;
+    case 'continuar': continuar(); break;
+    case 'voltar': voltar(); break;
+    case 'voltar-bravo': W.passo = 1; renderWizard({ dir:-1 }); break;
+    case 'confirmar': confirmar(); break;
+    case 'novo': novoWizard(); renderWizard({ dir:1 }); break;
+    case 'raca':
+      W.pet.raca = v;
+      var inp = document.getElementById('f-raca'); if (inp) inp.value = v;
+      var ps = porteSugerido(v);
+      if (ps && (!W.pet.porte || W.porteAuto)) { W.pet.porte = ps; W.porteAuto = true; }
+      if (v === SRD && W.porteAuto) { W.pet.porte = ''; W.porteAuto = false; }
+      fecharListaRacas();
+      var cr = document.getElementById('c-raca'); if (cr) cr.classList.remove('erro');
+      refresh1(); break;
+    case 'porte': W.pet.porte = v; W.porteAuto = false; t.closest('.campo').classList.remove('erro'); refresh1(); break;
+    case 'comp': W.pet.comp = v; t.closest('.campo').classList.remove('erro'); refresh1(); break;
+    case 'idade-': case 'idade+':
+      var cur = W.pet.idade === '' ? (act === 'idade+' ? 0 : 1) : +W.pet.idade;
+      cur = Math.max(0, Math.min(25, cur + (act === 'idade+' ? 1 : -1)));
+      W.pet.idade = cur; document.getElementById('f-idade').value = cur;
+      document.getElementById('c-idade').classList.remove('erro'); refresh1(); break;
+    case 'servico':
+      W.servico = v;
+      document.querySelectorAll('.servico').forEach(function(b){ b.classList.toggle('sel', b.dataset.v === v); });
+      document.getElementById('c-serv').classList.remove('erro'); break;
+    case 'dia':
+      if (t.dataset.ok !== '1') { balao(t, t.dataset.motivo); break; }
+      W.data = v; W.hora = null;
+      renderWizard({ anim:false, manterScroll:true });
+      var th = document.getElementById('titulo-horas'); if (th) th.scrollIntoView({ behavior:'smooth', block:'start' });
+      break;
+    case 'hora':
+      if (t.dataset.estado !== 'livre') { balao(t, t.dataset.motivo); break; }
+      W.hora = +v;
+      document.querySelectorAll('.hora').forEach(function(b){ b.classList.toggle('sel', b === t); });
+      break;
+    case 'painel-aba': P.aba = v; renderPainel(); break;
+    case 'painel-modo': P.modo = v; renderPainel({ anim:false }); break;
+    case 'painel-dia': P.dia = v; renderPainel({ anim:false, manterScroll:true }); break;
+    case 'concluir': case 'cancelar': case 'reabrir':
+      var ag = ags.find(function(a){ return a.id === t.dataset.id; });
+      if (ag) { ag.status = act === 'concluir' ? 'concluido' : act === 'cancelar' ? 'cancelado' : 'agendado'; salvarAgs(); P.destacar = null; renderPainel({ anim:false, manterScroll:true });
+        toast(act === 'concluir' ? 'Marcado como concluído' : act === 'cancelar' ? 'Cancelado — a vaga voltou para a agenda online' : 'Agendamento reaberto', 'ok', 2000); }
+      break;
+    case 'balcao': abrirBalcao(); break;
+    case 'fechar-modal': fecharModal(); break;
+    case 'salvar-balcao': salvarBalcao(); break;
+    case 'restaurar':
+      if (!window.confirm('Restaurar os dados de exemplo? Os agendamentos e as regras voltam ao padrão.')) break;
+      cfg = clone(CFG_PADRAO); ags = gerarExemplos(); salvarCfg(); salvarAgs(); marcarConhecidos(); P.destacar = null;
+      renderPainel({ anim:false }); toast('Dados de exemplo restaurados', 'ok'); break;
+    case 'cfg-dia':
+      var d = +v, i = cfg.diasSensiveis.indexOf(d);
+      if (i >= 0) cfg.diasSensiveis.splice(i,1); else cfg.diasSensiveis.push(d);
+      cfgMudou(); renderPainel({ anim:false, manterScroll:true }); break;
+    case 'cfg-raca-rem':
+      cfg.braqui = cfg.braqui.filter(function(b){ return b !== v; }); cfgMudou('Raça removida da lista'); renderPainel({ anim:false, manterScroll:true }); break;
+    case 'cfg-raca-add':
+      var ni = document.getElementById('cfg-nova-raca'), nv = ni ? ni.value.trim() : '';
+      if (!nv) break;
+      if (!cfg.braqui.some(function(b){ return norm(b) === norm(nv); })) cfg.braqui.push(nv);
+      cfgMudou('Raça adicionada à lista'); renderPainel({ anim:false, manterScroll:true }); break;
+  }
+});
+$phone.addEventListener('click', function(e){ if (e.target.id === 'modal') fecharModal(); });
+
+$phone.addEventListener('input', function(e){
+  var t = e.target, id = t.id;
+  if (id === 'f-nome') { W.pet.nome = t.value; document.getElementById('c-nome').classList.remove('erro'); }
+  else if (id === 'f-raca') {
+    var exato = todasRacas().concat([SRD]).find(function(r){ return norm(r) === norm(t.value); });
+    W.pet.raca = exato || '';
+    renderListaRacas(t.value); refresh1();
+  }
+  else if (id === 'f-idade') {
+    var n = t.value === '' ? '' : Math.max(0, Math.min(25, parseInt(t.value,10) || 0));
+    W.pet.idade = n; document.getElementById('c-idade').classList.remove('erro'); refresh1();
+  }
+  else if (id === 'f-tutor') { W.tutor = t.value; document.getElementById('c-tutor').classList.remove('erro'); }
+  else if (id === 'f-tel' || id === 'b-tel') {
+    var m = mascaraTel(t.value); t.value = m;
+    if (id === 'f-tel') { W.tel = m; document.getElementById('c-tel').classList.remove('erro'); }
+  }
+  else if (id === 'b-idade') atualizarBalcao();
+});
+$phone.addEventListener('focusin', function(e){ if (e.target.id === 'f-raca') renderListaRacas(e.target.value); });
+$phone.addEventListener('change', function(e){
+  var t = e.target, id = t.id;
+  if (id === 'f-carro') { W.carro = t.checked; document.getElementById('c-carro').classList.remove('erro'); }
+  else if (id === 'cfg-verao') { cfg.verao = t.checked; cfgMudou(t.checked ? 'Modo verão ligado — horários quentes bloqueados' : 'Modo verão desligado — tarde liberada para braquicefálicos'); }
+  else if (id === 'cfg-ini' || id === 'cfg-fim') {
+    var a = +document.getElementById('cfg-ini').value, b = +document.getElementById('cfg-fim').value;
+    if (b <= a) { if (id === 'cfg-ini') b = Math.min(19, a+1); else a = Math.max(9, b-1); }
+    cfg.quenteIni = a; cfg.quenteFim = b; cfgMudou(); renderPainel({ anim:false, manterScroll:true });
+  }
+  else if (id === 'cfg-idoso') { cfg.idadeIdoso = Math.max(1, Math.min(25, +t.value || 8)); t.value = cfg.idadeIdoso; cfgMudou(); }
+  else if (id === 'cfg-vagas') { cfg.vagas = Math.max(1, Math.min(10, +t.value || 1)); t.value = cfg.vagas; cfgMudou(); }
+  else if (id === 'b-raca') { var ps = porteSugerido(t.value); if (ps) document.getElementById('b-porte').value = ps; atualizarBalcao(); }
+  else if (id === 'b-comp') atualizarBalcao();
+  else if (id === 'b-data') atualizarHorasBalcao();
+});
+$phone.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') { fecharModal(); fecharListaRacas(); }
+  if (e.key === 'Enter' && e.target.id === 'cfg-nova-raca') { var b = document.querySelector('[data-act="cfg-raca-add"]'); if (b) b.click(); }
+});
+
+/* ============================================================
+   ROTAS
+   ============================================================ */
+function rota(){
+  fecharModal();
+  var h = location.hash;
+  if (h === '#painel') { recarregarDados(); renderPainel(); }
+  else if (h === '#agendar') renderWizard({ dir:1 });
+  else renderWhats();
+}
+window.addEventListener('hashchange', rota);
+carregar();
+rota();
+})();
+</script>
+</body>
+</html>
